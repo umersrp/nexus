@@ -1,0 +1,57 @@
+.mainContainer {
+  /* padding: 0px 40px; */
+  /* height: calc(100vh - 83px); */
+  /* overflow-y: scroll; */
+  /* padding-top: 25px; */
+  height: 100%;
+}
+
+.headingContainer {
+  display: flex;
+  align-items: center;
+  padding-block: 10px;
+  justify-content: space-between;
+}
+
+.headingContainer span {
+  font-family: "inter-bold";
+  font-size: 40px;
+  line-height: 47px;
+  color: #000000;
+}
+
+.btnContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.addBtn {
+  background: #dc143c;
+  border-radius: 5px;
+}
+
+.viewDetailBtn {
+  padding: 5px 20px;
+  border-radius: 10px;
+  background-color: transparent;
+  color: var(--primary-color);
+  font-size: 16px;
+  font-family: "inter-medium";
+}
+
+.paginationDiv {
+  margin-block: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.listContainer {
+}
+
+@media (max-width: 991px) {
+  .mainContainer {
+    /* padding: 0px 24px; */
+  }
+}

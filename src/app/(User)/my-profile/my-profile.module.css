@@ -1,0 +1,56 @@
+.mainContainer {
+  min-height: calc(100vh - 80px);
+  background-color: #fff;
+}
+.mainContainer :global(.tailwind-container) {
+  /* min-height: inherit; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.innerContainer {
+  /* border-radius: 10px; */
+  /* padding: 2rem 3.5rem; */
+  /* width: clamp(400px, 75%, 650px); */
+  /* background: var(--bg-color); */
+  width: 100%;
+}
+.imgDiv img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.imgDiv {
+  margin-inline: auto;
+  width: auto;
+  height: 60px;
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.loginBtn {
+  margin: 20px 0 0 0;
+  width: 100%;
+  font-size: 16px;
+}
+.col {
+  margin: 20px 0;
+}
+.signupText {
+  color: var(--white-color);
+  margin-top: 20px;
+  text-align: center;
+}
+.signupText a {
+  color: var(--primary-color);
+}
+@media (max-width: 768px) {
+  .innerContainer {
+    /* padding: 1.5rem 2.5rem; */
+  }
+}
+@media (max-width: 575px) {
+  .innerContainer {
+    /* padding: 1.5rem 1.5rem; */
+  }
+}

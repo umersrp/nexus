@@ -1,0 +1,88 @@
+.Container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  flex-grow: 1;
+}
+
+.labelText {
+  color: var(--input-label-color);
+  font-family: var(--archivo);
+  font-weight: 400;
+  font-size: 15px;
+  /* margin-bottom: 8px; */
+}
+
+.inputBox {
+  font-family: var(--archivo);
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--text-color-black);
+  border-radius: inherit;
+  background-color: inherit;
+  padding: 11px 15px;
+  width: 100%;
+  border: none;
+  outline: none;
+}
+.inputBox:disabled {
+  color: var(--input-disabled-color) !important;
+  cursor: not-allowed;
+}
+
+.inputPassContainer {
+  display: flex;
+  position: relative;
+  border-radius: 8px;
+  background: var(--input-bg-color);
+  box-shadow: 3px 3px 2px 0px rgba(0, 0, 0, 0.15);
+}
+
+.inputPassContainer input::placeholder {
+  color: var(--input-placeholder-color);
+  font-size: 16px;
+}
+
+.inputPassContainer .passwordIcon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  bottom: 50%;
+  transform: translateY(-50%);
+  color: #928f8f;
+}
+
+.errorText {
+  color: red;
+}
+
+.disabled {
+}
+
+.leftIconBox {
+  position: absolute;
+  left: 20px;
+  top: 55%;
+  bottom: 45%;
+  transform: translateY(-50%);
+  height: max-content;
+}
+
+.rightIcon {
+  position: absolute;
+  right: 8px;
+  top: 55%;
+  bottom: 45%;
+  transform: translateY(-50%);
+  height: max-content;
+}
+
+.inputPassContainer input::-webkit-outer-spin-button,
+.inputPassContainer input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.inputPassContainer input[type="number"] {
+  -moz-appearance: textfield;
+}

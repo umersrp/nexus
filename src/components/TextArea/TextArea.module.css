@@ -1,0 +1,44 @@
+.textAreaBox {
+  position: relative;
+}
+
+.textAreaBox label {
+  color: var(--input-label-color);
+  font-size: 16px;
+}
+.textAreaBox[data-variant="web"] label {
+  color: var(--text-color-black);
+}
+:global(.dark) .textAreaBox[data-variant="web"] label {
+  color: var(--white-color);
+}
+.mb10 {
+  margin-bottom: 8px;
+}
+.textAreaBox textarea {
+  padding: 12px;
+  font-size: 16px;
+  color: var(--text-color-black);
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  width: 100%;
+  background-color: var(--white-color);
+  box-shadow: 0px 0 5px 2px #0000000d;
+  border-radius: 20px;
+  outline: none;
+  border: none;
+}
+.textAreaBox[data-variant="web"] textarea {
+  background: var(--input-bg-color);
+  box-shadow: 3px 3px 2px 0px rgba(0, 0, 0, 0.15);
+}
+
+.textAreaBox textarea::placeholder {
+  color: var(--placeholder-color);
+  font-size: 16px;
+}
+.labelAndTooltip {
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
+}

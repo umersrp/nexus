@@ -1,0 +1,45 @@
+.GiHamburgerMenu {
+  font-size: 30px;
+  color: var(--primary-color);
+  position: absolute;
+  top: 25px;
+  left: 20px;
+}
+
+.sidebarDiv {
+  width: 280px;
+}
+
+.contentDiv {
+  width: calc(100% - 280px);
+}
+
+@media screen and (max-width: 1440px) {
+  .sidebarDiv {
+    width: 270px;
+  }
+
+  .contentDiv {
+    width: calc(100% - 270px);
+  }
+}
+
+@media screen and (max-width: 1220px) {
+  .sidebarDiv {
+    width: 250px;
+  }
+
+  .contentDiv {
+    width: calc(100% - 250px);
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  .sidebarDiv {
+    width: 240px;
+  }
+
+  .contentDiv {
+    width: calc(100% - 240px);
+  }
+}

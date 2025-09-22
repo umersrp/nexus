@@ -1,0 +1,284 @@
+.landingPage {
+  width: 100%;
+
+  background: var(--bg-color);
+  padding-top: 130px;
+}
+.landingPage :global(.MuiStepLabel-label) {
+  color: var(--white-color) !important;
+}
+
+.mainContainer :global(.table100-head),
+.mainContainer :global(.table100-body tr:nth-child(even)) {
+  background: var(--white-color) !important;
+}
+.mainContainer .tableDiv {
+  background: var(--white-color);
+}
+.mainContainer :global(.table100-head) th {
+  color: var(--text-black-color);
+  font-weight: 600;
+}
+.mainContainer :global(.table100-head),
+.mainContainer :global(.table100-body) {
+  border-bottom: 1px solid lightgray;
+}
+
+.mainContainer :global(.table100) {
+  box-shadow: unset;
+}
+
+.mainSection {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+
+  padding-block: 30px;
+}
+.mainSection::before {
+  content: " ";
+  top: 0;
+  left: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.8;
+  background-attachment: fixed;
+}
+
+.mainContainer {
+  opacity: 1;
+  position: relative;
+  margin-bottom: 50px;
+}
+.tableDiv {
+  border-radius: 50px;
+  padding: 30px 20px;
+  min-height: calc(100vh - 300px);
+}
+.tableDiv h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--text-black-color);
+}
+.mainContainer h3 {
+}
+.mainForm {
+  box-shadow: 0 3px 29px rgb(37 29 64 / 75%);
+  padding: 32px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.521);
+  width: 100%;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.buttonContainer {
+  margin-top: 30px;
+  display: grid;
+  place-items: center;
+}
+
+.buttonContainer button {
+  width: 300px;
+}
+.addSubBtn {
+  padding: 8px 10px !important;
+}
+.quantity {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.quantity p {
+  margin-bottom: 0px;
+}
+.walletAddress {
+  background: var(--input-bg-color);
+  border-radius: 20px;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.walletAddress p {
+  word-break: break-all;
+}
+.walletAddress svg {
+  cursor: pointer;
+}
+.paymentComplete {
+  background: #fff9f947 !important;
+  color: var(--white-color);
+}
+.paymentComplete .content {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - 400px);
+}
+
+.paymentComplete .checkIcon {
+  border-radius: 273px;
+  background: linear-gradient(180deg, #9aa0ff 0%, #545ef5 100%);
+  box-shadow: 0px 0px 61.3px 0px #959bff inset,
+    6px 3px 2px 0px rgba(0, 0, 0, 0.15);
+  padding: 40px;
+}
+@media (max-width: 768px) {
+  .walletAddress svg {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .mTop {
+    margin-top: 1.5rem;
+  }
+}
+@media (max-width: 768px) {
+  .mainContainer {
+    --bs-gutter-x: 0;
+  }
+  .mainSection {
+    height: auto;
+  }
+  .mainSection {
+    padding: 20px 0;
+  }
+}
+@media (max-width: 425px) {
+  .mainContainer {
+    max-width: 98%;
+  }
+  .buttonContainer button {
+    width: 100%;
+  }
+}
+
+.main {
+  width: 100%;
+  box-shadow: 1px 1px 6px 1px rgb(37 29 64 / 23%);
+  padding: 20px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  position: relative;
+  background-color: #ffffffc2;
+  display: flex;
+  column-gap: 20px;
+}
+
+.imageContainer {
+  width: 300px;
+  height: 200px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.imageContainer img,
+.imageContainer video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.main h5 {
+  font-family: "Coiny";
+  font-size: 20px;
+  margin: 10px 0;
+  text-transform: capitalize;
+}
+
+.main p {
+  font-size: 13px;
+  margin-bottom: 0 !important;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 38px;
+}
+
+.main button {
+  background-color: #466e2b;
+  font-size: 12px;
+  padding: 10px 15px;
+  margin-top: 15px;
+}
+
+.mainOther button {
+  background-color: red !important;
+}
+
+.catContainer {
+  position: absolute;
+  background-color: #251d40;
+  left: 0;
+  top: 10%;
+  padding: 5px 20px 5px 15px;
+  border-top-right-radius: 100vw;
+  border-bottom-right-radius: 100vw;
+  min-width: 160px;
+  color: white;
+  font-size: 12px;
+}
+
+.catContainer span {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+.amount {
+  margin-top: 20px;
+}
+.amount span {
+  font-weight: bold;
+  margin-left: 8px;
+}
+
+.deleteBtn {
+  background: red !important;
+  box-shadow: unset;
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: absolute;
+  right: 20px;
+  top: 0px;
+  padding: 0px !important;
+}
+.qtyAndTotal {
+  display: flex;
+  column-gap: 10px;
+  align-items: center;
+}
+.qtyAndTotal button {
+  margin: 0px !important;
+}
+.qtyAndTotal p {
+  margin-bottom: 0px;
+  min-height: 0px;
+}
+.row {
+  row-gap: 20px;
+}
+.telegramIcon {
+  margin-left: 8px;
+  width: 30px !important;
+  height: 30px !important;
+}

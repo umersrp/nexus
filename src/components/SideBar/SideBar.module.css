@@ -1,0 +1,87 @@
+.mainContainer {
+  height: 100vh;
+  width: 100%;
+  background: var(--bg-color);
+  box-shadow: 0px 4px 20px 10px rgb(0 0 0 / 6%);
+  user-select: none;
+}
+.itemsContainer {
+  height: calc(100vh - 120px);
+  padding-top: 10px;
+  overflow-y: scroll;
+}
+.logoContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--white-color);
+  height: 120px;
+  background-color: var(--dashboard-secondary-color);
+}
+.logoContainer img {
+  width: 120px;
+  height: auto;
+}
+
+.listItemContainer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-block: 10px;
+  padding-left: 20px;
+  margin-block: 5px;
+  cursor: pointer;
+  position: relative;
+}
+
+.marginZero {
+  margin-block: 0px !important;
+}
+
+.listItemContainer span {
+  font-size: 16px;
+  color: var(--white-color);
+  margin-left: 18px;
+}
+.dropDownIcon {
+  position: absolute;
+  right: 15px;
+  top: 22%;
+}
+
+.active {
+  background: var(--primary-color);
+  margin-right: 30px;
+  border-radius: 0px 10px 10px 0px;
+}
+
+.active span {
+  color: var(--white-color);
+  font-weight: 600;
+}
+
+.innerItemContainer {
+  padding-block: 10px;
+  padding-left: 60px;
+  cursor: pointer;
+}
+
+.innerItemContainer span {
+  font-size: 14px;
+  color: var(--white-color);
+}
+
+.active svg {
+  color: var(--white-color) !important;
+}
+.subActive span {
+  font-weight: 600;
+  text-decoration: underline;
+}
+.subActive svg {
+  color: var(--white-color) !important;
+}
+
+.itemsContainer::-webkit-scrollbar {
+  display: none;
+}

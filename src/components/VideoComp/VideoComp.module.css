@@ -1,0 +1,7 @@
+.video {
+  width: 100%;
+  height: calc(50vh - 3.65rem);
+  /* height: 45vh; */
+  /* object-fit: cover; */
+  /* object-position: top center; */
+}

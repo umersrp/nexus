@@ -1,0 +1,38 @@
+.page {
+  width: 100%;
+
+  background: var(--bg-color);
+  padding-top: 130px;
+  padding-bottom: 40px;
+}
+
+.mainContainer :global(.table100-head),
+.mainContainer :global(.table100-body tr:nth-child(even)) {
+  background: var(--white-color) !important;
+}
+.mainContainer .tableDiv {
+  background: var(--white-color);
+}
+.mainContainer :global(.table100-head) th {
+  color: var(--text-black-color);
+  font-weight: 600;
+}
+.mainContainer :global(.table100-head),
+.mainContainer :global(.table100-body) {
+  border-bottom: 1px solid lightgray;
+}
+
+.mainContainer :global(.table100) {
+  box-shadow: unset;
+}
+
+.tableDiv {
+  border-radius: 50px;
+  padding: 30px 20px;
+  min-height: calc(100vh - 300px);
+}
+.tableDiv h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--text-black-color);
+}

@@ -1,0 +1,37 @@
+.btnContainer {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+.submitBtn {
+  width: 200px;
+}
+
+.tagContainer {
+}
+
+.tag {
+  padding: 5px 15px;
+  background: aliceblue;
+  border-radius: 10px;
+  margin-right: 5px;
+  position: relative;
+}
+.tagCloseIcon {
+  position: absolute;
+  right: -5px;
+  top: -5px;
+}
+
+.addMoreBtn {
+  background: var(--white-color);
+  padding: 3px 10px;
+  font-size: 15px;
+  box-shadow: unset;
+  border: 1px solid #01fe1b;
+  color: #01fe1b;
+}
+
+.removeBtn {
+  padding: 7px 15px !important;
+}

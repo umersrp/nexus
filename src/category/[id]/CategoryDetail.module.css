@@ -1,0 +1,72 @@
+.main {
+  background: var(--bg-color);
+}
+.labelValue {
+}
+.labelValue label {
+  font-size: 17px;
+  font-weight: 500;
+  display: inline-block;
+}
+.labelValue p {
+  font-size: 15px;
+  display: inline-block;
+  margin-bottom: 0px;
+}
+
+.detailSection {
+  padding-block: 40px;
+  color: var(--white-color);
+  min-height: 100vh;
+}
+.detailSection :global(.MuiPaginationItem-previousNext) {
+  color: var(--white-color);
+}
+.caroImage {
+  height: calc(100vh - 200px);
+  width: 100%;
+  position: relative;
+}
+.caroImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.caro {
+  width: 100%;
+}
+.caro :global(.slick-dots li button::before) {
+  color: var(--white-color);
+  font-size: 15px;
+}
+.caro :global(.slick-dots .slick-active button::before) {
+  color: var(--primary-color);
+}
+.desc {
+  min-height: 120px;
+}
+.paginationDiv {
+  margin-block: 40px;
+  display: flex;
+  justify-content: center;
+}
+.hero {
+  padding-bottom: 0px !important;
+  padding-top: 80px !important ;
+}
+.heroDiv {
+  background: #747aff;
+  padding: 20px;
+}
+
+.slide {
+  width: 100%;
+  height: calc(100vh - 120px);
+  position: relative;
+  overflow: hidden;
+  border-radius: 25px;
+}
+.slide img {
+  object-position: center center;
+  object-fit: cover;
+}

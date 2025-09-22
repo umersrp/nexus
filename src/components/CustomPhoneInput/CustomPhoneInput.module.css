@@ -1,0 +1,39 @@
+.phoneInput {
+  font-family: var(--font-archivo);
+  font-size: 16px !important;
+  color: var(--input-text-color);
+  background-color: var(--input-bg-color) !important;
+  width: 100% !important;
+  min-height: 46px !important;
+  border: none !important;
+  border-radius: 33px !important;
+}
+.phoneInputContainer :global(.flag-dropdown),
+.phoneInputContainer :global(.selected-flag) {
+  border-radius: 33px !important;
+  background-color: var(--input-bg-color) !important;
+}
+.phoneInputContainer {
+  background-color: var(--white-color);
+  border-radius: 33px !important;
+}
+
+.phoneInput:focus {
+  box-shadow: none !important;
+}
+
+.phoneInput::placeholder {
+  color: var(--input-placeholder-color);
+}
+
+.phoneLabel {
+  color: var(--input-label-color);
+  font-family: var(--font-archivo);
+  font-weight: 400;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.labelDisabled {
+  color: #ababab;
+}

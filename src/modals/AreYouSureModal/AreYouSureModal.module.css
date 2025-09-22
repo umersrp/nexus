@@ -1,0 +1,64 @@
+.modal {
+}
+.modal :global(.modal-content) {
+  border-radius: 20px;
+  overflow: hidden;
+}
+.content h4 {
+  text-align: center;
+  font-size: 25px;
+}
+
+.btnsBox {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.yesBtn {
+  padding: 7px 30px;
+}
+
+.noBtn {
+  padding: 7px 30px;
+  margin-left: 20px;
+}
+
+.iconDiv {
+  margin-bottom: 6px;
+}
+
+.modalHeader {
+  background: var(--bg-color);
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.headingText {
+  font-size: 24px;
+  color: var(--white-color);
+}
+.message {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--dashboard-text-color);
+}
+
+.aCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mainDiv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 75%;
+  margin: auto;
+}

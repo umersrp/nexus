@@ -1,0 +1,57 @@
+.headingText {
+  font-size: 24px;
+  color: var(--white-color);
+  text-transform: capitalize;
+}
+.mainDiv :global(.ant-rate-star-first) {
+  color: red !important;
+}
+.btnContainer {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+.submitBtn {
+  /* background-color: var(--dashboard-main-color); */
+  padding: 10px 0px;
+  width: 170px;
+  border-radius: 10px;
+  font-size: 17px;
+}
+
+.tagContainer {
+}
+
+.tag {
+  padding: 5px 15px;
+  background: aliceblue;
+  border-radius: 10px;
+  margin-right: 5px;
+  position: relative;
+}
+.tagCloseIcon {
+  position: absolute;
+  right: -5px;
+  top: -5px;
+}
+
+.labelMain {
+  color: var(--text-black-color) !important;
+  font-size: 16px !important;
+}
+.labelAndAddMoreBtn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.labelAndAddMoreBtn button {
+  background: var(--white-color);
+  padding: 3px 10px;
+  font-size: 15px;
+  box-shadow: unset;
+  border: 1px solid #3745dd;
+  color: #3745dd;
+}
+.img {
+  height: 150px;
+}

@@ -1,0 +1,17 @@
+.loaderContainer {
+  height: calc(100vh - 80px);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: var(--bg-color);
+}
+.hv100 {
+  height: 100vh;
+}
+.loaderContainer img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

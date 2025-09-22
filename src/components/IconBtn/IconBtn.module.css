@@ -1,0 +1,11 @@
+.btnContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: max-content;
+  background: var(--bg-color);
+  color: var(--white-color);
+  padding: 7px 10px;
+  border-radius: 5px;
+}
