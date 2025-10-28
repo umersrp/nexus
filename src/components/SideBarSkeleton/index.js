@@ -10,6 +10,7 @@ import classes from "./SideBarSkeleton.module.css";
 const SideBarSkeleton = ({ heading, children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
     isMobileViewHook(setIsMobile);
   }, []);
@@ -17,20 +18,21 @@ const SideBarSkeleton = ({ heading, children }) => {
   const toggleDrawer = () => {
     setIsOpen((prevState) => !prevState);
   };
+
   return (
     <>
       <style>{`
-        .drawerContainer{
-          width:320px !important;
+        .drawerContainer {
+          width: 320px !important;
         }
-        @media (max-width:768px){
-          .drawerContainer{
-            width:290px !important;
+        @media (max-width: 768px) {
+          .drawerContainer {
+            width: 290px !important;
           }
         }
-    `}</style>
+      `}</style>
       <div fluid className="g-0">
-        <div className="g-0 flex">
+        <div className="g-0 flex h-screen">
           <div className={[!isMobile && classes.sidebarDiv].join(" ")}>
             {!isMobile ? (
               <SideBar />
@@ -45,12 +47,7 @@ const SideBarSkeleton = ({ heading, children }) => {
               </Drawer>
             )}
           </div>
-          <div
-            className={[
-              !isMobile && classes.contentDiv,
-              "dark:bg-[var(--page-bg-color)]",
-            ].join(" ")}
-          >
+          <div className={[!isMobile && classes.contentDiv].join(" ")}>
             {isMobile && (
               <GiHamburgerMenu
                 className={[classes.GiHamburgerMenu]}
@@ -59,8 +56,10 @@ const SideBarSkeleton = ({ heading, children }) => {
                 }}
               />
             )}
-            <Header heading={heading} />
-            {children}
+            <div style={{ paddingLeft: isMobile ? "20px" : "0" }}>
+              <Header heading={heading} />
+              {children}
+            </div>
           </div>
         </div>
       </div>

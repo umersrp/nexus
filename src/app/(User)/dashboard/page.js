@@ -33,10 +33,37 @@ const ShowPlans = ({ onPurchase }) => {
 
   const getPlans = async () => {
     setLoading(true);
-    const response = await Get(BaseURL('plans/get-plans'));
-    setLoading(false);
-    if (response) {
-      setPlans(response?.data?.data);
+    try {
+      // FORCE CLEAR CACHE - Use completely fresh API call
+      const timestamp = Date.now();
+      const randomId = Math.random().toString(36).substring(7);
+      const apiUrl = `${BaseURL('subscriptions/plans')}?_t=${timestamp}&_r=${randomId}&_cache=false`;
+      
+      console.log('🚀 Dashboard - FORCING FRESH API CALL:', apiUrl);
+      console.log('🚀 Dashboard - Old API (plans/get-plans) is DEPRECATED!');
+      
+      const response = await Get(apiUrl);
+      console.log('✅ Dashboard - Plans response:', response);
+      setLoading(false);
+      
+      if (response) {
+        // Handle the correct response structure
+        const plansData = response?.data?.plans || response?.data?.data?.plans || response?.data?.data;
+        console.log('📊 Dashboard - Extracted plans data:', plansData);
+        if (Array.isArray(plansData)) {
+          setPlans(plansData);
+          console.log('✅ Dashboard - Plans loaded successfully:', plansData.length);
+        } else {
+          console.log('⚠️ Dashboard - No plans data found');
+          setPlans([]);
+        }
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error('❌ Dashboard - Error fetching plans:', error);
+      console.error('❌ Dashboard - Error response:', error?.response?.data);
+      console.error('❌ Dashboard - This should NOT be plans/get-plans!');
+      setPlans([]);
     }
   };
 
@@ -46,13 +73,25 @@ const ShowPlans = ({ onPurchase }) => {
   return (
     <Row className='mt-2' gutter={[16, 16]}>
       <Col xs={24}>
-        <h5 className='font-semibold dark:text-white'>
-          To start your session, Please{' '}
-          <span className='font-bold cursor-pointer text-[var(--blue-color)] '>
-            select plan
-          </span>{' '}
-          first
-        </h5>
+        <div className="flex justify-between items-center mb-4">
+          <h5 className='font-semibold dark:text-white'>
+            To start your session, Please{' '}
+            <span className='font-bold cursor-pointer text-[var(--blue-color)] '>
+              select plan
+            </span>{' '}
+            first
+          </h5>
+          <button 
+            onClick={() => {
+              console.log('🔄 Testing dashboard API call...');
+              console.log('🔄 Clearing browser cache...');
+              getPlans();
+            }}
+            className='px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm font-bold'
+          >
+            🔄 Force Refresh API
+          </button>
+        </div>
       </Col>
       {loading ? (
         <Col xs={24}>
@@ -63,7 +102,7 @@ const ShowPlans = ({ onPurchase }) => {
       ) : (
         plans?.map((a, i) => (
           <Col md={8} sm={12} xs={24} key={i}>
-            <PlanCard key={i} data={a} onPurchase={() => onPurchase(a?._id)} />
+            <PlanCard key={i} data={a} onPurchase={() => onPurchase(a?.name || a?._id)} />
           </Col>
         ))
       )}
@@ -84,15 +123,48 @@ function Home() {
 
   const voiceMode = getPreferenceVoice(user?.preferences);
 
-  const selectPlan = async (id) => {
-    const response = await Post(
-      BaseURL(`auth/select-plan`),
-      { planId: id },
-      apiHeader(accessToken)
-    );
-    if (response) {
-      toast.success('Plan purchased successfully');
-      dispatch(updateUser(response?.data?.data?.user));
+  const selectPlan = async (planName) => {
+    try {
+      const subscriptionData = {
+        planName,
+        billingCycle: 'monthly',
+        paymentMethod: 'credit_card',
+        paymentDetails: {
+          token: 'tok_visa'
+        }
+      };
+
+      const response = await Post(
+        BaseURL('subscriptions/subscribe'),
+        subscriptionData,
+        apiHeader(accessToken)
+      );
+      
+      if (response?.data?.success) {
+        toast.success('Plan subscribed successfully!');
+        
+        // Update user's subscription info in Redux store
+        if (response?.data?.data?.subscription) {
+          const updatedUser = {
+            ...user,
+            subscription: response?.data?.data?.subscription
+          };
+          dispatch(updateUser(updatedUser));
+          console.log('✅ Dashboard - User subscription updated:', updatedUser.subscription);
+        } else if (response?.data?.data?.user) {
+          dispatch(updateUser(response?.data?.data?.user));
+        }
+        
+        // Force page refresh to ensure UI updates
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        toast.error(response?.data?.message || 'Failed to subscribe');
+      }
+    } catch (error) {
+      console.error('Subscription error:', error);
+      toast.error(error?.response?.data?.message || 'Failed to subscribe. Please try again.');
     }
   };
 
@@ -189,7 +261,15 @@ function Home() {
 
   return (
     <>
-      {!user?.plan ? (
+      {/* Debug Info */}
+      <div className="fixed top-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded z-50 text-sm">
+        <strong>Dashboard Debug:</strong><br/>
+        Plan: <code>{user?.subscription?.plan || 'none'}</code><br/>
+        Status: <code>{user?.subscription?.status || 'none'}</code><br/>
+        Show Plans: <code>{(!user?.subscription?.plan || user?.subscription?.plan === 'none') ? 'YES' : 'NO'}</code>
+      </div>
+      
+      {!user?.subscription?.plan || user?.subscription?.plan === 'none' ? (
         <MainLayout>
           <div className='min-h-screen '>
             <ShowPlans onPurchase={selectPlan} />

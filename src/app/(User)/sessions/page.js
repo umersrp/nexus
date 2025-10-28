@@ -1,7 +1,6 @@
 'use client';
 import { Delete, Get } from '@/Axios/AxiosFunctions';
-import { apiHeader, BaseURL, recordsLimit } from '@/config/apiUrl';
-import useDebounce from '@/custom-hooks/useDebounce';
+import { BaseURL, recordsLimit } from '@/config/apiUrl';
 import Button from '@/components/Button';
 import TableComponent from '@/components/TableComponent';
 import axios from 'axios';
@@ -30,7 +29,7 @@ const Users = () => {
   useEffect(() => {
     setPage(1);
     getAllData(1);
-  }, [debounceSearch]);
+  }, []);
 
   const getAllData = async (pageNo) => {
     const url = `${apiUrl}/get-my-sessions?page=${pageNo}&limit=${recordsLimit}`;

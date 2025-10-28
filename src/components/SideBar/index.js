@@ -2,7 +2,8 @@
 import Cookies from "js-cookie";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { FaBookOpen, FaUsers } from "react-icons/fa";
+import Image from "next/image";
+import { FaBookOpen, FaUsers, FaUserShield } from "react-icons/fa";
 import { MdDashboard, MdEmail } from "react-icons/md";
 import { PiPackageBold } from "react-icons/pi";
 import {
@@ -94,9 +95,7 @@ const SideBar = () => {
   return (
     <div className={classes?.mainContainer}>
       <div className={classes.logoContainer}>
-        <h4 className="text-white text-center mt-4">
-          <span>Nexus</span> <span className="text-xl block">AI Space</span>
-        </h4>
+        <Image src="/image.png" alt="Nexus Logo" width={130} height={38} priority />
       </div>
       <div className={classes.itemsContainer}>
         <>
@@ -106,14 +105,29 @@ const SideBar = () => {
             path={"/admin/dashboard"}
           />
           <RenderItem
+            title={"Administrator"}
+            icon={<FaUserShield size={22} color={"rgba(255, 255, 255, 0.6)"} />}
+            path={"/admin/administrator"}
+          />
+          <RenderItem
             title={"Users"}
             icon={<FaUsers size={22} color={"rgba(255, 255, 255, 0.6)"} />}
             path={"/admin/users"}
           />
           <RenderItem
+            title={"Tutorials"}
+            icon={<FaBookOpen size={22} color={"rgba(255, 255, 255, 0.6)"} />}
+            path={"/admin/tutorials"}
+          />
+          <RenderItem
             title={"Sessions"}
             icon={<FaBookOpen size={22} color={"rgba(255, 255, 255, 0.6)"} />}
             path={"/admin/sessions"}
+          />
+          <RenderItem
+            title={"AI Session Approval"}
+            icon={<FaBookOpen size={22} color={"rgba(255, 255, 255, 0.6)"} />}
+            path={"/admin/ai-session-approval"}
           />
           <RenderItem
             title={"Reviews"}

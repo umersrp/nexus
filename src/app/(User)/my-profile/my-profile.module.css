@@ -1,6 +1,8 @@
 .mainContainer {
   min-height: calc(100vh - 80px);
-  background-color: #fff;
+  background-color: #f8fafc;
+  background-image: radial-gradient(circle at 10% 0%, rgba(59,130,246,0.06) 0, rgba(248,250,252,0) 40%),
+    radial-gradient(circle at 90% 20%, rgba(16,185,129,0.06) 0, rgba(248,250,252,0) 45%);
 }
 .mainContainer :global(.tailwind-container) {
   /* min-height: inherit; */
@@ -10,10 +12,44 @@
 }
 .innerContainer {
   /* border-radius: 10px; */
-  /* padding: 2rem 3.5rem; */
-  /* width: clamp(400px, 75%, 650px); */
-  /* background: var(--bg-color); */
+  /* width: clamp(400px, 75%, 800px); */
   width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
+}
+.sectionCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  position: relative; /* ensure stacking context can be controlled */
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+.sectionCard:hover {
+  box-shadow: 0 12px 36px rgba(2, 6, 23, 0.10);
+  transform: translateY(-1px);
+  z-index: 10; /* lift above adjacent sections when interacting */
+}
+
+/* keep dropdowns above sibling cards while focused/open */
+.sectionCard:focus-within {
+  z-index: 10;
+}
+
+/* ensure common dropdown menus render on top */
+.sectionCard :global(.ant-select-dropdown) {
+  z-index: 2000 !important;
+}
+.sectionCard :global(.react-select__menu) {
+  z-index: 2000 !important;
+}
+.sectionCard :global(.ant-picker-dropdown) {
+  z-index: 2000 !important;
 }
 .imgDiv img {
   width: 100%;
@@ -46,11 +82,13 @@
 }
 @media (max-width: 768px) {
   .innerContainer {
-    /* padding: 1.5rem 2.5rem; */
+    padding: 16px;
+    border-radius: 10px;
   }
 }
 @media (max-width: 575px) {
   .innerContainer {
-    /* padding: 1.5rem 1.5rem; */
+    padding: 12px;
+    border-radius: 8px;
   }
 }

@@ -5,6 +5,7 @@ import SideBarSkeleton from '@/components/SideBarSkeleton';
 import { apiHeader, BaseURL, recordsLimit } from '@/config/apiUrl';
 import useDebounce from '@/custom-hooks/useDebounce';
 import Button from '@/components/Button';
+import SessionSettingsModal from '@/modals/SessionSettingsModal';
 import TableComponent from '@/components/TableComponent';
 import ViewUserModal from '@/modals/ViewUserModal';
 import { useEffect, useState } from 'react';
@@ -26,6 +27,8 @@ const Sessions = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
   const debounceSearch = useDebounce(search, 500);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [sessionSettings, setSessionSettings] = useState({ duration: 30, allowPauseResume: true, allowStop: true });
 
   const apiUrl = BaseURL('admin/sessions');
 
@@ -153,7 +156,11 @@ const Sessions = () => {
               placeholder={`Search user name or email or ID`}
               value={search}
               setter={setSearch}
+              inputContainerClass={classes.inputPlain}
             />
+            <Button onClick={() => setSettingsOpen(true)} className={classes.settingsBtn}>
+              Session Settings
+            </Button>
           </div>
           <TableComponent
             columns={columns}
@@ -185,6 +192,15 @@ const Sessions = () => {
           setSelectedItem(null);
         }}
         data={selectedItem}
+      />
+      <SessionSettingsModal
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        initial={sessionSettings}
+        onSave={(val) => {
+          setSessionSettings(val);
+          setSettingsOpen(false);
+        }}
       />
     </SideBarSkeleton>
   );

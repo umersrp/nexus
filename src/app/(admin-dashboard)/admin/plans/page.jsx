@@ -1,14 +1,15 @@
 'use client';
-import { Get, Patch } from '@/Axios/AxiosFunctions';
+import { Get, Post } from '@/Axios/AxiosFunctions';
 import IconBtn from '@/components/IconBtn';
 import SideBarSkeleton from '@/components/SideBarSkeleton';
 import TableComponent from '@/components/TableComponent';
 import { apiHeader, BaseURL } from '@/config/apiUrl';
-import AddOrEditPackageModal from '@/modals/AddOrEditPackageModal';
 import ViewPackageModal from '@/modals/ViewPackageModal';
+import AddOrEditPackageModal from '@/modals/AddOrEditPackageModal';
 import { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
+import { decryptToken } from '@/config/helper';
 import { AiFillEye } from 'react-icons/ai';
-import { MdModeEdit } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 
 export default function Packages() {
@@ -18,20 +19,30 @@ export default function Packages() {
   const [loading, setLoading] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
 
-  const apiUrl = BaseURL('admin/plan');
+  const getAuthToken = () => {
+    if (typeof window === 'undefined') return undefined;
+    const enc = Cookies.get('xpdx');
+    const raw = Cookies.get('token');
+    const ls = localStorage.getItem('token');
+    const dec = enc ? decryptToken(enc) : null;
+    return dec || raw || accessToken || ls || undefined;
+  };
 
   useEffect(() => {
     getAllData();
   }, []);
 
   const getAllData = async () => {
-    const url = `${apiUrl}/get-all-plans`;
+    const paramsTs = `_ts=${Date.now()}`;
+    const url = BaseURL(`subscriptions/plans?${paramsTs}`);
+    const token = getAuthToken();
     setLoading('get');
-    const apiResponse = await Get(url, accessToken);
+    const apiResponse = await Get(url, token);
     setLoading('');
 
     if (apiResponse !== undefined) {
-      setResponseData(apiResponse?.data?.data);
+      const items = apiResponse?.data?.data?.plans || apiResponse?.data?.plans || apiResponse?.data?.data || [];
+      setResponseData(Array.isArray(items) ? items : []);
     }
   };
   const columns = [
@@ -68,34 +79,26 @@ export default function Packages() {
               }}
               title='View'
             />
-            <IconBtn
-              icon={<MdModeEdit />}
-              onClick={() => {
-                setSelectedItem(record);
-                setShowModal('edit');
-              }}
-              title='Edit'
-            />
           </div>
         );
       },
     },
   ];
 
-  const handleUpdatePackage = async (e) => {
-    const url = `${apiUrl}/update-plan/${selectedItem?._id}`;
-    setLoading('edit');
-    const apiResponse = await Patch(url, e, apiHeader(accessToken));
-    setLoading('');
-    if (apiResponse !== undefined) {
-      const newData = [...responseData];
-      newData.splice(
-        newData?.findIndex((item) => item?._id === selectedItem?._id),
-        1,
-        apiResponse?.data?.data
-      );
-      setResponseData(newData);
-      setSelectedItem(apiResponse?.data?.data);
+  const handleUpdatePackage = async (payload) => {
+    try {
+      setLoading('edit');
+      // Create plan via admin route
+      const urlCreate = BaseURL('subscriptions/create/plan');
+      const token = getAuthToken();
+      const headers = apiHeader(token);
+      const apiResponse = await Post(urlCreate, payload, headers);
+      if (apiResponse !== undefined) {
+        await getAllData();
+        setShowModal(null);
+      }
+    } finally {
+      setLoading('');
     }
   };
 
@@ -103,6 +106,15 @@ export default function Packages() {
     <SideBarSkeleton heading={'Plans'}>
       <div className='px-[40px] mt-[40px]'>
         <>
+          <div className='flex justify-end mb-4'>
+            <button
+              onClick={() => { setSelectedItem(null); setShowModal('edit'); }}
+              className='px-4 py-2 rounded-md text-white'
+              style={{ background: '#1E3A8A' }}
+            >
+              Create Plan
+            </button>
+          </div>
           <TableComponent
             columns={columns}
             data={responseData}
@@ -126,7 +138,7 @@ export default function Packages() {
           setShowModal(false);
           setSelectedItem(null);
         }}
-        key={selectedItem?._id}
+        key={selectedItem?._id || 'create'}
         onClick={handleUpdatePackage}
         loading={loading == 'edit'}
         data={selectedItem}

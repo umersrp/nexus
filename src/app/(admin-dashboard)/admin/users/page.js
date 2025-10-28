@@ -1,5 +1,5 @@
 'use client';
-import { Delete, Patch, Post } from '@/Axios/AxiosFunctions';
+import { Delete, Patch, Post, Get } from '@/Axios/AxiosFunctions';
 import DropDown from '@/components/DropDown';
 import IconBtn from '@/components/IconBtn';
 import Input from '@/components/Input';
@@ -12,6 +12,8 @@ import AreYouSureModal from '@/modals/AreYouSureModal';
 import ViewUserModal from '@/modals/ViewUserModal';
 import { Tag } from 'antd';
 import { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
+import { decryptToken } from '@/config/helper';
 import { AiFillDelete, AiFillEye } from 'react-icons/ai';
 import { FaLock, FaUnlock } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
@@ -32,7 +34,15 @@ const Users = () => {
   const [search, setSearch] = useState('');
   const debounceSearch = useDebounce(search, 500);
 
-  const apiUrl = BaseURL('admin/users');
+  const getAuthToken = () => {
+    if (typeof window === 'undefined') return undefined;
+    const enc = Cookies.get('xpdx');
+    const raw = Cookies.get('token');
+    const ls = localStorage.getItem('token');
+    const dec = enc ? decryptToken(enc) : null;
+    // Prefer fresh cookie token to avoid stale localStorage tokens
+    return dec || raw || accessToken || ls || undefined;
+  };
 
   useEffect(() => {
     setPage(1);
@@ -40,18 +50,40 @@ const Users = () => {
   }, [debounceSearch, status]);
 
   const getAllData = async (pageNo) => {
-    const url = `${apiUrl}/get-all-users?page=${pageNo}&limit=${recordsLimit}`;
-    setLoading(true);
-    const apiResponse = await Post(
-      url,
-      { search, status: status?.value },
-      apiHeader(accessToken)
-    );
-    setLoading(false);
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      params.set('role', 'learner');
+      params.set('page', String(pageNo || 1));
+      params.set('limit', String(recordsLimit || 20));
+      if (typeof debounceSearch === 'string' && debounceSearch.trim().length > 0) {
+        params.set('search', debounceSearch.trim());
+      }
+      params.set('_ts', Date.now().toString());
 
-    if (apiResponse !== undefined) {
-      setResponseData(apiResponse?.data?.data);
-      setTotalPages(apiResponse?.data?.totalCount);
+      const url = BaseURL(`users?${params.toString()}`);
+      const res = await Get(url, getAuthToken(), true);
+
+      const items = res?.data?.data?.users
+        || res?.data?.users
+        || res?.data?.data?.items
+        || res?.data?.data?.results
+        || res?.data?.results
+        || [];
+      const normalized = (Array.isArray(items) ? items : []).map((u) => ({
+        ...u,
+        status: u?.status || (u?.isActive === true ? 'active' : u?.isActive === false ? 'deactive' : 'pending'),
+      }));
+      const totalPagesFromApi = res?.data?.data?.pagination?.totalPages
+        || res?.data?.pagination?.totalPages
+        || res?.data?.data?.totalPages
+        || res?.data?.totalPages
+        || 1;
+
+      setResponseData(normalized);
+      setTotalPages(Number(totalPagesFromApi) > 0 ? Number(totalPagesFromApi) : 1);
+    } finally {
+      setLoading(false);
     }
   };
 

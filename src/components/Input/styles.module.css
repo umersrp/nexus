@@ -19,11 +19,14 @@
   font-size: 16px;
   color: var(--text-color-black);
   border-radius: inherit;
-  background-color: inherit;
+  background-color: transparent;
   padding: 11px 15px;
   width: 100%;
   border: none;
   outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: none !important;
 }
 .inputBox:disabled {
   color: var(--input-disabled-color) !important;
@@ -33,10 +36,13 @@
 .inputPassContainer {
   display: flex;
   position: relative;
-  border-radius: 8px;
-  background: var(--input-bg-color);
-  box-shadow: 3px 3px 2px 0px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  transition: border-color .15s ease, box-shadow .15s ease;
 }
+.inputPassContainer:hover { border-color: #c5cbd5; }
+.inputPassContainer:focus-within { border-color: #1e3a8a; box-shadow: 0 0 0 3px rgba(30,58,138,0.12); }
 
 .inputPassContainer input::placeholder {
   color: var(--input-placeholder-color);

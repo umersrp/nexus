@@ -3,7 +3,6 @@ import { Delete, Get, Patch } from '@/Axios/AxiosFunctions';
 import IconBtn from '@/components/IconBtn';
 import SideBarSkeleton from '@/components/SideBarSkeleton';
 import TableComponent from '@/components/TableComponent';
-import UserGraph from '@/components/UsersGraph';
 import { apiHeader, BaseURL } from '@/config/apiUrl';
 import AreYouSureModal from '@/modals/AreYouSureModal';
 import ViewUserModal from '@/modals/ViewUserModal';
@@ -19,40 +18,54 @@ import {
 } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { Cell, Pie, PieChart, Tooltip } from 'recharts';
+import {
+  Cell,
+  Pie,
+  PieChart,
+  Tooltip,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Legend,
+  AreaChart,
+  Area,
+  ResponsiveContainer,
+} from 'recharts';
 import classes from './users.module.css';
-const StatsCard = ({ value, title, icon, loading }) => {
+const StatsCard = ({ value, title, icon, loading, subtitle }) => {
   return (
-    <div className='bg-[var(--primary-color)] px-5 py-4 rounded-[20px] shadow-[#24234254] shadow'>
-      <span className='text-end'>{icon}</span>
-      <h6 className='text-[var(--white-color)] '>{title}</h6>
-
-      {loading ? (
-        <Skeleton.Input
-          active={loading}
-          size='default'
-          style={{ width: '50%' }}
-          block={true}
-          className='mt-2'
-        ></Skeleton.Input>
-      ) : (
-        <h5 className='text-[var(--secondary-color)] leading-[1] mt-3'>
-          {value}
-        </h5>
-      )}
+    <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
+      <div className='flex items-start justify-between'>
+        <div>
+          <h6 className='text-gray-600 text-sm font-semibold'>{title}</h6>
+          {loading ? (
+            <Skeleton.Input active={loading} size='default' style={{ width: 100 }} className='mt-2' />
+          ) : (
+            <div className='mt-2'>
+              <div className='text-2xl font-bold text-gray-900'>{value ?? 0}</div>
+              {subtitle && <div className='text-xs text-gray-500 mt-1'>{subtitle}</div>}
+            </div>
+          )}
+        </div>
+        <div className='w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center'>
+          {icon}
+        </div>
+      </div>
     </div>
   );
 };
 
 const AdminDashboard = () => {
   const accessToken = useSelector((state) => state.authReducer.accessToken);
-  const [responseData, setResponseData] = useState([]);
+  const [responseData, setResponseData] = useState({});
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showModal, setShowModal] = useState('');
   const apiUrl = BaseURL('admin/users');
-  const statsUrl = BaseURL('admin/stats');
+  const statsUrl = BaseURL('analytics/dashboard');
 
   useEffect(() => {
     getAllData();
@@ -69,7 +82,8 @@ const AdminDashboard = () => {
     setLoading(false);
 
     if (apiResponse !== undefined) {
-      setResponseData(apiResponse?.data);
+      // Expecting { success, data: { users, courses, enrollments, revenue, quizzes } }
+      setResponseData(apiResponse?.data?.data || {});
     }
   };
 
@@ -181,10 +195,9 @@ const AdminDashboard = () => {
       setResponseData({ ...responseData, users: dataCopy });
 
       toast.success(
-        `User has been ${
-          ['active', 'approved'].includes(response?.data?.data?.status)
-            ? 'activated'
-            : 'deactivated'
+        `User has been ${['active', 'approved'].includes(response?.data?.data?.status)
+          ? 'activated'
+          : 'deactivated'
         } successfully!`
       );
 
@@ -192,21 +205,61 @@ const AdminDashboard = () => {
       setSelectedItem(null);
     }
   };
+  const users = responseData?.users || {};
+  const courses = responseData?.courses || {};
+  const enrollments = responseData?.enrollments || {};
+  const revenue = responseData?.revenue || {};
+  const quizzes = responseData?.quizzes || {};
+  const activeRate = users?.total ? Math.round(((users?.active || 0) / users?.total) * 100) : 0;
+  // Synthetic but safe datasets (until backend provides timeseries)
+  const months = ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
+  const userGrowthData = months.map((m, idx) => ({
+    month: m,
+    newUsers: idx === months.length - 1 ? (users?.newThisMonth || 0) : 0,
+  }));
+  const revenueTrendData = months.map((m, idx) => ({
+    month: m,
+    revenue: idx === months.length - 1 ? (Number(revenue?.thisMonth) || 0) : 0,
+  }));
+  const courseBars = [
+    { name: 'Published', value: courses?.published || 0 },
+    { name: 'Pending', value: courses?.pendingApproval || 0 },
+    { name: 'Draft', value: (courses?.total || 0) - (courses?.published || 0) - (courses?.pendingApproval || 0) },
+  ];
   const stats = [
     {
       title: 'Total Users',
-      value: responseData?.totalUsers,
-      icon: <FaUsers size={45} color={'rgba(255, 255, 255, 0.6)'} />,
+      value: users?.total,
+      icon: <FaUsers size={20} color={'#1e3a8a'} />,
     },
     {
-      title: 'Subscribed Users',
-      value: responseData?.subscribedUsers,
-      icon: <FaUserShield size={45} color={'rgba(255, 255, 255, 0.6)'} />,
+      title: 'Active Users',
+      value: users?.active,
+      icon: <FaUserShield size={20} color={'#1e3a8a'} />,
+      subtitle: `${activeRate}% of total`
     },
     {
-      title: 'Total Sessions',
-      value: responseData?.totalSessions,
-      icon: <FaBookOpen size={45} color={'rgba(255, 255, 255, 0.6)'} />,
+      title: 'New This Month',
+      value: users?.newThisMonth,
+      icon: <FaBookOpen size={20} color={'#1e3a8a'} />,
+    },
+    {
+      title: 'Courses (Published)',
+      value: `${courses?.published || 0}/${courses?.total || 0}`,
+      icon: <FaBookOpen size={20} color={'#1e3a8a'} />,
+      subtitle: `${courses?.pendingApproval || 0} pending approval`
+    },
+    {
+      title: 'Revenue (This Month)',
+      value: `$${(revenue?.thisMonth || 0).toFixed ? revenue?.thisMonth?.toFixed(2) : revenue?.thisMonth || 0}`,
+      icon: <FaUsers size={20} color={'#1e3a8a'} />,
+      subtitle: `Total $${(revenue?.total || 0).toFixed ? revenue?.total?.toFixed(2) : revenue?.total || 0}`
+    },
+    {
+      title: 'Enrollments (This Week)',
+      value: enrollments?.thisWeek,
+      icon: <FaUsers size={20} color={'#1e3a8a'} />,
+      subtitle: `Completion ${enrollments?.completionRate || 0}%`
     },
   ];
 
@@ -336,54 +389,175 @@ const AdminDashboard = () => {
           </div> */}
 
           <Row className='mb-[40px]' gutter={[16, 16]}>
-            {stats?.map((item) => (
-              <Col md={8}>
+            {stats?.map((item, index) => (
+              <Col md={8} key={index}>
                 <StatsCard
                   title={item?.title}
                   value={item?.value}
                   icon={item?.icon}
                   loading={loading}
+                  subtitle={item?.subtitle}
                 />
               </Col>
             ))}
           </Row>
 
-          <Row gutter={[16, 16]}>
-            <Col md={24}>
-              <UserGraph values={responseData?.months ?? []} />
+          {/* Charts Section (Premium Layout) */}
+          <Row className='mb-[40px]' gutter={[16, 16]}>
+            <Col md={16}>
+              <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
+                <h6 className='text-gray-800 text-lg font-semibold mb-4'>New Users</h6>
+                <div className='h-72'>
+                  <ResponsiveContainer width='100%' height='100%'>
+                    <BarChart data={userGrowthData} barSize={26}>
+                      <CartesianGrid strokeDasharray='3 3' vertical={false} />
+                      <XAxis dataKey='month' tick={{ fill: '#6b7280' }} />
+                      <YAxis tick={{ fill: '#6b7280' }} />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey='newUsers' fill='#2563eb' radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
             </Col>
-            <Col md={12}>
-              <UserGraph
-                values={responseData?.months ?? []}
-                yField='sessions'
-                title={'Sessions'}
-                type='column'
-              />
+            <Col md={8}>
+              <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
+                <h6 className='text-gray-800 text-lg font-semibold mb-4'>Users Split</h6>
+                <div className='h-72 flex items-center justify-center'>
+                  <PieChart width={280} height={230}>
+                    <Pie
+                      data={[
+                        { name: 'Active', value: users?.active || 0, fill: '#10b981' },
+                        { name: 'Inactive', value: (users?.total || 0) - (users?.active || 0), fill: '#f59e0b' },
+                      ]}
+                      cx='50%'
+                      cy='50%'
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                      outerRadius={85}
+                      dataKey='value'
+                    >
+                      {[
+                        { name: 'Active', value: users?.active || 0, fill: '#10b981' },
+                        { name: 'Inactive', value: (users?.total || 0) - (users?.active || 0), fill: '#f59e0b' },
+                      ].map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </div>
+              </div>
             </Col>
-            <Col md={12}>
-              <div
-                className='px-3 py-5 shadow-[#24234254] shadow rounded-[20px] dark:!bg-[var(--table-bg-color)]
-    dark:text-white'
-              >
-                <h5 className=' text-[var(--primary-color)]'>Ratings</h5>
-                <PieChart width={400} height={340} className='pie-chart'>
-                  <Pie
-                    data={responseData?.ratings}
-                    cx='50%'
-                    cy='50%'
-                    labelLine={false}
-                    label={renderCustomizedLabel}
-                    fill='red'
-                    dataKey='value'
-                  >
-                    {responseData?.ratings?.map((entry, index) => (
-                      <>
-                        <Cell key={`cell-${index}`} fill={COLORS[index]} />
-                      </>
-                    ))}
-                  </Pie>
-                  <Tooltip content={CustomTooltip} />
-                </PieChart>
+          </Row>
+
+          <Row className='mb-[40px]' gutter={[16, 16]}>
+            <Col md={16}>
+              <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
+                <h6 className='text-gray-800 text-lg font-semibold mb-4'>Revenue Trend</h6>
+                <div className='h-72'>
+                  <ResponsiveContainer width='100%' height='100%'>
+                    <AreaChart data={revenueTrendData}>
+                      <defs>
+                        <linearGradient id='colorRev' x1='0' y1='0' x2='0' y2='1'>
+                          <stop offset='5%' stopColor='#16a34a' stopOpacity={0.6} />
+                          <stop offset='95%' stopColor='#16a34a' stopOpacity={0.05} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray='3 3' vertical={false} />
+                      <XAxis dataKey='month' tick={{ fill: '#6b7280' }} />
+                      <YAxis tick={{ fill: '#6b7280' }} />
+                      <Tooltip />
+                      <Area type='monotone' dataKey='revenue' stroke='#16a34a' fillOpacity={1} fill='url(#colorRev)' />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </Col>
+            <Col md={8}>
+              <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
+                <h6 className='text-gray-800 text-lg font-semibold mb-4'>Courses Breakdown</h6>
+                <div className='h-72'>
+                  <ResponsiveContainer width='100%' height='100%'>
+                    <BarChart data={courseBars} barSize={26}>
+                      <CartesianGrid strokeDasharray='3 3' vertical={false} />
+                      <XAxis dataKey='name' tick={{ fill: '#6b7280' }} />
+                      <YAxis tick={{ fill: '#6b7280' }} />
+                      <Tooltip />
+                      <Bar dataKey='value' fill='#7c3aed' radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </Col>
+          </Row>
+
+          <Row className='mb-[40px]' gutter={[16, 16]}>
+            <Col md={8}>
+              <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
+                <h6 className='text-gray-800 text-lg font-semibold mb-4'>Quiz Performance</h6>
+                <div className='space-y-3'>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-600'>Total Attempts</span>
+                    <span className='font-semibold text-gray-900'>{quizzes?.totalAttempts || 0}</span>
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-600'>Passed</span>
+                    <span className='font-semibold text-green-600'>{quizzes?.passed || 0}</span>
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-600'>Average Score</span>
+                    <span className='font-semibold text-blue-600'>{quizzes?.averageScore || 0}%</span>
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-600'>Pass Rate</span>
+                    <span className='font-semibold text-purple-600'>{quizzes?.passRate || 0}%</span>
+                  </div>
+                </div>
+              </div>
+            </Col>
+            <Col md={8}>
+              <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
+                <h6 className='text-gray-800 text-lg font-semibold mb-4'>Enrollment Stats</h6>
+                <div className='space-y-3'>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-600'>Total Enrollments</span>
+                    <span className='font-semibold text-gray-900'>{enrollments?.total || 0}</span>
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-600'>Active</span>
+                    <span className='font-semibold text-green-600'>{enrollments?.active || 0}</span>
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-600'>Completed</span>
+                    <span className='font-semibold text-blue-600'>{enrollments?.completed || 0}</span>
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-600'>This Week</span>
+                    <span className='font-semibold text-purple-600'>{enrollments?.thisWeek || 0}</span>
+                  </div>
+                </div>
+              </div>
+            </Col>
+            <Col md={8}>
+              <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
+                <h6 className='text-gray-800 text-lg font-semibold mb-4'>Revenue Breakdown</h6>
+                <div className='space-y-3'>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-600'>Total Revenue</span>
+                    <span className='font-semibold text-gray-900'>${(revenue?.total || 0).toFixed ? revenue?.total?.toFixed(2) : revenue?.total || 0}</span>
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-600'>This Month</span>
+                    <span className='font-semibold text-green-600'>${(revenue?.thisMonth || 0).toFixed ? revenue?.thisMonth?.toFixed(2) : revenue?.thisMonth || 0}</span>
+                  </div>
+                  <div className='flex items-center justify-center mt-4'>
+                    <div className='w-16 h-16 rounded-full bg-green-100 flex items-center justify-center'>
+                      <span className='text-green-600 font-bold text-lg'>$</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </Col>
           </Row>
@@ -391,7 +565,7 @@ const AdminDashboard = () => {
           <h5 className='text-[var(--primary-color)] mb-2 mt-5'>Users</h5>
           <TableComponent
             columns={columns}
-            data={responseData?.users}
+            data={Array.isArray(responseData?.users) ? responseData?.users : []}
             isLoading={loading}
             className={classes.table}
           />
@@ -410,11 +584,10 @@ const AdminDashboard = () => {
       <AreYouSureModal
         show={showModal == 'status'}
         setShow={setShowModal}
-        subTitle={`Do you really want to ${
-          ['active', 'approved'].includes(selectedItem?.status)
+        subTitle={`Do you really want to ${['active', 'approved'].includes(selectedItem?.status)
             ? 'deactivate'
             : 'activate'
-        } this item?`}
+          } this item?`}
         onClick={handleUpdateStatus}
         isApiCall={submitLoading}
       />

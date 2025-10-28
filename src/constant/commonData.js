@@ -5,20 +5,20 @@ export const preferencesOptions = [
 
 export const genderOptions = [
   {
-    label: 'Male',
-    value: 'male',
-  },
-  {
     label: 'Female',
     value: 'female',
   },
   {
-    label: 'Non-binary',
-    value: 'non_binary',
+    label: 'Male',
+    value: 'male',
   },
   {
-    label: 'Prefer not to say',
-    value: 'prefer_not_to_say',
+    label: 'Other',
+    value: 'other',
+  },
+  {
+    label: 'Prefer not to mention',
+    value: 'prefer_not_to_mention',
   },
 ];
 
@@ -92,84 +92,55 @@ export const areaOfInterestOptions = [
 ];
 
 export const vocabularyTopicOptions = [
-  { label: 'Education and Teaching', value: 'education_and_teaching' },
-  { label: 'Sales and Marketing', value: 'sales_and_marketing' },
-  { label: 'Business and Management', value: 'business_and_management' },
-  { label: 'Media and Communications', value: 'media_and_communications' },
-  {
-    label: 'Customer Service and Engagement',
-    value: 'customer_service_and_engagement',
-  },
-  {
-    label: 'Creative Arts and Literature',
-    value: 'creative_arts_and_literature',
-  },
-  {
-    label: 'Freelancing and Entrepreneurship',
-    value: 'freelancing_and_entrepreneurship',
-  },
-  { label: 'Technology and Information', value: 'technology_and_information' },
-  { label: 'Legal and Law', value: 'legal_and_law' },
-  { label: 'Healthcare and Medicine', value: 'healthcare_and_medicine' },
+  { label: 'Sales & Marketing', value: 'sales_and_marketing' },
+  { label: 'Customer Service & Client Relations', value: 'customer_service_and_client_relations' },
+  { label: 'Entrepreneurship & Startups', value: 'entrepreneurship_and_startups' },
+  { label: 'International Business Environments', value: 'international_business_environments' },
+  { label: 'Negotiation & Business Development', value: 'negotiation_and_business_development' },
+  { label: 'Pitching & Fundraising', value: 'pitching_and_fundraising' },
 ];
 
 export const vocabularyLevelOptions = [
-  { label: 'Beginner', value: 'beginner' },
-  { label: 'Intermediate', value: 'intermediate' },
-  { label: 'Advanced', value: 'advanced' },
+  { label: 'A1/A2 (Basic User)', value: 'a1_a2' },
+  { label: 'B1 (Intermediate)', value: 'b1' },
+  { label: 'B2 (Upper Intermediate)', value: 'b2' },
+  { label: 'C1 (Advanced)', value: 'c1' },
 ];
 export const communicationStyleOptions = [
-  { label: 'Academic', value: 'academic' },
-  { label: 'Formal/Professional', value: 'formal/professional' },
-  { label: 'Casual', value: 'casual' },
-  { label: 'Semi-Formal', value: 'semi-formal' },
+  { label: 'Formal', value: 'formal' },
+  { label: 'Neutral', value: 'neutral' },
+  { label: 'Persuasive', value: 'persuasive' },
+  { label: 'Conversational', value: 'conversational' },
 ];
 export const ageRangeOptions = [
   {
-    label: '18 - 25',
-    value: '18 to 25',
+    label: '15–18',
+    value: '15-18',
   },
   {
-    label: '26 - 35',
-    value: '26 to 35',
+    label: '19–25',
+    value: '19-25',
   },
   {
-    label: '36 - 45',
-    value: '36 to 45',
+    label: '26–35',
+    value: '26-35',
+  },
+  {
+    label: '36–45',
+    value: '36-45',
   },
   {
     label: '45+',
-    value: '45+',
+    value: '45_plus',
   },
 ];
 
-export const professionalBackgroundOptions = [
-  {
-    label: 'Student',
-    value: 'student',
-  },
-  {
-    label: 'Employed',
-    value: 'employed',
-  },
-  {
-    label: 'Self-Employed',
-    value: 'self-employed',
-  },
-  {
-    label: 'Unemployed',
-    value: 'unemployed',
-  },
-
-  {
-    label: 'On a Gap Year/Career break',
-    value: 'on_a_gap_year/career_break',
-  },
-
-  {
-    label: 'Job Seeker',
-    value: 'job_seeker',
-  },
+export const currentRoleOptions = [
+  { label: 'Student (University/College)', value: 'student_university_college' },
+  { label: 'Job Seeker (Fresh Graduate / Early Career)', value: 'job_seeker_fresh_grad_early_career' },
+  { label: 'Employee (Business / Corporate)', value: 'employee_business_corporate' },
+  { label: 'Entrepreneur / Startup Founder', value: 'entrepreneur_startup_founder' },
+  { label: 'Freelancer (Business Services)', value: 'freelancer_business_services' },
 ];
 
 export const userStatusOptions = [

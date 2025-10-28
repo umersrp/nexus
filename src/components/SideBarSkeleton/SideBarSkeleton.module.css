@@ -8,17 +8,20 @@
 
 .sidebarDiv {
   width: 280px;
+  flex-shrink: 0; /* Prevent sidebar from shrinking */
 }
 
 .contentDiv {
   width: calc(100% - 280px);
+  transition: width 0.3s ease;
+  overflow-x: hidden; /* Prevent horizontal overflow */
+  background: #ffffff; /* force light background */
 }
 
 @media screen and (max-width: 1440px) {
   .sidebarDiv {
     width: 270px;
   }
-
   .contentDiv {
     width: calc(100% - 270px);
   }
@@ -28,7 +31,6 @@
   .sidebarDiv {
     width: 250px;
   }
-
   .contentDiv {
     width: calc(100% - 250px);
   }
@@ -38,8 +40,16 @@
   .sidebarDiv {
     width: 240px;
   }
-
   .contentDiv {
     width: calc(100% - 240px);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .sidebarDiv {
+    display: none; /* Hide sidebar on mobile when drawer is used */
+  }
+  .contentDiv {
+    width: 100%;
   }
 }

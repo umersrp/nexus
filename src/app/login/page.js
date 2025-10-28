@@ -51,40 +51,53 @@ const Login = () => {
       });
     }
     const url = BaseURL('auth/login');
+    console.log('Login request:', { url, params, headers });
     setLoading(true);
-    const response = await Post(url, params, headers);
-    setLoading(false);
+    try {
+      const response = await Post(url, params, headers);
+      setLoading(false);
 
-    if (response !== undefined) {
-      dispatch(saveLoginUserData(response?.data?.data));
-      cookies.set('xpdx', encryptToken(response?.data?.data?.token), {
-        expires: 90,
-      });
-      cookies.set('role', encryptToken(response?.data?.data?.user?.role), {
-        expires: 90,
-      });
-      toast.success('Logged In successfully');
-      if (response?.data?.data?.user?.role == 'admin') {
-        router.replace('/admin/dashboard');
-      } else {
-        router.push(
-          response?.data?.data?.user?.isProfileComplete
-            ? response?.data?.data?.user?.isSession
-              ? '/sessions'
-              : '/dashboard'
-            : '/my-profile'
-        );
+      if (response !== undefined) {
+        dispatch(saveLoginUserData(response?.data?.data));
+        cookies.set('xpdx', encryptToken(response?.data?.data?.token), {
+          expires: 90,
+        });
+        cookies.set('role', response?.data?.data?.user?.role, {
+          expires: 90,
+        });
+        toast.success('Logged In successfully');
+        if (['admin', 'super_admin'].includes(response?.data?.data?.user?.role)) {
+          router.replace('/admin/dashboard');
+        } else {
+          router.push(
+            response?.data?.data?.user?.isProfileComplete
+              ? response?.data?.data?.user?.isSession
+                ? '/sessions'
+                : '/dashboard'
+              : '/my-profile'
+          );
+        }
       }
+    } catch (error) {
+      setLoading(false);
+      console.error('Login error:', error);
+      CustomToast({
+        message: error?.response?.data?.message || 'Login failed. Please check your credentials.',
+        type: 'error',
+      });
     }
   };
   return (
     <div
-      className={[classes.mainContainer, 'bg-[var(--page-bg-color)]'].join(' ')}
+      className={[classes.mainContainer, 'bg-white'].join(' ')}
     >
       <div className='tailwind-container '>
-        <div className={[classes.innerContainer]}>
+        <div className={[classes.innerContainer].join(' ')}>
           <div className='grid-rows-1'>
             <div md={12}>
+              <div className={classes.imgDiv}>
+                <img src={'/image.png'} alt='Nexus' />
+              </div>
               <h4 className='text-center text-white'>Login</h4>
             </div>
             <div md={12}>
@@ -117,6 +130,9 @@ const Login = () => {
             <div md={12}>
               <p className={classes?.signupText}>
                 {"Don't have an account?"} <Link href={'/signup'}>Sign Up</Link>
+              </p>
+              <p className={classes?.signupText}>
+                <Link href={'/forgot-password'}>Forgot password?</Link>
               </p>
             </div>
           </div>

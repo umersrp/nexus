@@ -10,9 +10,32 @@
   column-gap: 20px;
   justify-content: space-between;
   width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .headingContainer > div:first-child {
   max-width: 330px;
+}
+
+/* Clean input look like the admin page */
+.inputPlain {
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+  border-radius: 8px !important;
+  min-height: 40px;
+}
+
+.settingsBtn {
+  background: #1570ef !important;
+  border: none !important;
+  color: #ffffff !important;
+  height: 40px !important;
+  padding: 0 16px !important;
+  border-radius: 8px !important;
 }
 
 .btnContainer {

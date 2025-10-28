@@ -1,0 +1,128 @@
+.page {
+  /* Very light background */
+  padding: 24px;
+  background-color: #fcfcfc; 
+}
+
+/* --- Header Section --- */
+.headerCard {
+  display: flex;
+  align-items: center;
+  gap: 16px; 
+  background: #ffffff;
+  border: 1px solid #e5e7eb; /* Light, subtle border */
+  border-radius: 8px; 
+  padding: 16px 20px; 
+  /* A refined, minimal shadow */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px; 
+}
+.inputPlain {
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  box-shadow: none !important; 
+  border-radius: 6px !important;
+  min-height: 40px;
+  width: 300px;
+  /* Darker text on focus for better clarity */
+  color: #374151; 
+}
+
+/* --- Primary Buttons (Header) --- */
+/* Primary Action Button (Create) - Deep Navy Blue */
+.createBtn { 
+  background: #1e3a8a; 
+  color: #ffffff; 
+  border: none; 
+  height: 40px; 
+  border-radius: 6px; 
+  font-weight: 600;
+  padding: 0 18px;
+  transition: background 0.2s;
+}
+.createBtn:hover { background: #172b6b; }
+
+/* Secondary Actions (Approve All, Generate All) - Use Subtle Gray & Primary Blue */
+
+/* Approve All: Now Primary Blue (Emphasis on final approval) */
+.approveAll { 
+  background: #1e3a8a; 
+  color: #ffffff; 
+  border: none; 
+  height: 40px; 
+  border-radius: 6px; 
+  font-weight: 600;
+  padding: 0 18px;
+  transition: background 0.2s;
+}
+.approveAll:hover { background: #172b6b; }
+
+/* Generate All: Now Light Gray/White (Less emphasis, secondary action) */
+.generateAll { 
+  background: #f3f4f6; /* Very light gray */
+  color: #374151; /* Dark text */
+  border: 1px solid #d1d5db; 
+  height: 40px; 
+  border-radius: 6px; 
+  font-weight: 600;
+  padding: 0 18px;
+  transition: background 0.2s;
+}
+.generateAll:hover { background: #e5e7eb; }
+
+/* --- Table Styles --- */
+.table :global(.ant-table-thead) { 
+  /* Ultra subtle header background */
+  background: #f9fafb; 
+}
+.table :global(.ant-table-container) {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.table :global(.ant-table-thead > tr > th) {
+  background: transparent;
+  font-weight: 700;
+  color: #4b5563; 
+  padding: 14px 18px;
+}
+.table :global(.ant-table-tbody > tr > td) { 
+  padding: 14px 18px; 
+}
+.table :global(.ant-table-tbody > tr:hover > td) {
+  background: #f9fafb !important;
+}
+
+/* --- Action Buttons (Table Row) --- */
+.actionBtn {
+  height: 30px; 
+  padding: 0 10px;
+  border-radius: 4px; 
+  font-weight: 600;
+  box-shadow: none; 
+  transition: background 0.2s;
+}
+
+/* Approve (Success) - Primary Blue */
+.approve { 
+    background: #1e3a8a; 
+    color: #fff; 
+    border: none; 
+}
+.approve:hover { background: #172b6b !important; color: #fff !important; }
+
+/* Regenerate (Secondary) - Neutral Gray */
+.regen { 
+    background: #f3f4f6; 
+    color: #4b5563; 
+    border: 1px solid #d1d5db; 
+}
+.regen:hover { background: #e5e7eb !important; color: #374151 !important; }
+
+/* Reject (Danger) - Corporate Red */
+.reject { 
+    background: #b91c1c; 
+    color: #fff; 
+    border: none; 
+}
+.reject:hover { background: #991b1b !important; color: #fff !important; }

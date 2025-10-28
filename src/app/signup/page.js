@@ -32,7 +32,7 @@ const Signup = () => {
       lastName,
       email,
       password,
-      passwordConfirm: confirmPassword,
+      confirmPassword: confirmPassword,
     };
     for (let key in params) {
       if (!params[key]) {
@@ -63,7 +63,7 @@ const Signup = () => {
       });
     }
     if (
-      !validator.isStrongPassword(params?.passwordConfirm, {
+      !validator.isStrongPassword(params?.confirmPassword, {
         minLength: 8,
         minNumbers: 0,
         minLowercase: 0,
@@ -89,16 +89,26 @@ const Signup = () => {
       });
     }
 
-    const url = BaseURL('auth/signup');
+    const url = BaseURL('auth/register');
     setLoading(true);
-    const response = await Post(url, params, headers);
-    setLoading(false);
+    try {
+      const response = await Post(url, params, headers);
+      setLoading(false);
 
-    if (response !== undefined) {
-      return CustomToast({
-        message:
-          'Congrats! You have successfully signed up, Please check your email to verify your account',
-        type: 'success',
+      if (response !== undefined) {
+        console.log('Registration response:', response);
+        return CustomToast({
+          message:
+            'Congrats! You have successfully signed up, Please check your email to verify your account',
+          type: 'success',
+        });
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error('Registration error:', error);
+      CustomToast({
+        message: error?.response?.data?.message || 'Registration failed. Please try again.',
+        type: 'error',
       });
     }
   };
@@ -176,6 +186,9 @@ const Signup = () => {
             <Col xs={24}>
               <p className={classes?.loginText}>
                 Already have an account? <Link href={'/login'}>Login</Link>
+              </p>
+              <p className={classes?.loginText}>
+                <Link href={'/resend-verification'}>Resend verification email</Link>
               </p>
             </Col>
           </Row>

@@ -47,20 +47,22 @@ let Post = async (route, data, headers, showAlert = true) => {
         toast.error(`${error.message} : Please Check Your Network Connection`, {
           position: "top-center",
         });
-      } else if (error.response.status == 400) {
+      } else if (error.response?.status == 400) {
         toast.error(error.response.data.message, {
           position: "top-center",
         });
-      } else if (error.response.status == 401) {
+      } else if (error.response?.status == 401) {
         toast.error(error.response.data.message, {
           position: "top-center",
         });
-      } else {
+      } else if (error.response?.data?.message) {
         toast.error(error.response.data.message, {
           position: "top-center",
         });
       }
     }
+    // Re-throw the error so the calling function can handle it
+    throw error;
   }
 };
 
@@ -88,10 +90,33 @@ let Patch = async (route, data, headers, showAlert = true) => {
   }
 };
 
-let Put = (route, data) => {
-  return axios.put(route, data).then((response) => {
-    return response.data;
-  });
+let Put = async (route, data, headers, showAlert = true) => {
+  try {
+    return await axios.put(route, data, headers);
+  } catch (error) {
+    console.log({ error });
+    if (showAlert == true) {
+      if (error.message === "Network Error") {
+        toast.error(`${error.message} : Please Check Your Network Connection`, {
+          position: "top-center",
+        });
+      } else if (error.response?.status == 400) {
+        toast.error(error.response.data.message, {
+          position: "top-center",
+        });
+      } else if (error.response?.status == 401) {
+        toast.error(error.response.data.message, {
+          position: "top-center",
+        });
+      } else if (error.response?.data?.message) {
+        toast.error(error.response.data.message, {
+          position: "top-center",
+        });
+      }
+    }
+    // Re-throw the error so the calling function can handle it
+    throw error;
+  }
 };
 
 let Delete = async (route, data, token, showAlert = true) => {

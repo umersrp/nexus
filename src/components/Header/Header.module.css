@@ -1,12 +1,12 @@
 .navbarContainer {
   display: flex;
   justify-content: space-between;
-
   align-items: center;
   padding-block: 13.5px;
   max-width: 100%;
   user-select: none;
-  background: var(--bg-color);
+  background: linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 .rightContainer {
   display: flex;
@@ -23,10 +23,10 @@
 }
 
 .headingContainer span {
-  font-size: 35px;
-  color: var(--primary-color);
-  font-weight: 600;
+  font-size: 0; /* hide text if any */
 }
+
+/* Dark mode switch removed */
 
 .navbarContainer svg {
   display: inline-block;

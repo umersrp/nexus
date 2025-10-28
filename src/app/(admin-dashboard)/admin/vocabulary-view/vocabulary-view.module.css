@@ -1,0 +1,188 @@
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.header h1 {
+  color: #1E3A8A;
+  margin: 10px 0;
+}
+
+.header p {
+  color: #666;
+  font-size: 16px;
+}
+
+.backBtn {
+  margin-bottom: 20px;
+}
+
+.loading {
+  text-align: center;
+  padding: 50px;
+}
+
+.levelsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.levelCard {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.levelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #1E3A8A;
+}
+
+.levelHeader h2 {
+  color: #1E3A8A;
+  margin: 0;
+}
+
+.wordCount {
+  background: #f0f8ff;
+  color: #1E3A8A;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.sessionContainer {
+  margin-bottom: 25px;
+}
+
+.sessionContainer h3 {
+  color: #333;
+  margin-bottom: 15px;
+  padding-left: 10px;
+  border-left: 4px solid #1E3A8A;
+}
+
+.wordsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+}
+
+.wordCard {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.wordCard:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+}
+
+.wordContent h4 {
+  color: #1E3A8A;
+  font-size: 18px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.wordContent p {
+  margin: 8px 0;
+  color: #555;
+  line-height: 1.5;
+}
+
+.wordActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.addWordCard {
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  transition: all 0.3s ease;
+}
+
+.addWordCard:hover {
+  border-color: #1E3A8A;
+  background: #f0f8ff;
+}
+
+.addWordBtn {
+  border: none;
+  background: transparent;
+  color: #1E3A8A;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.addWordBtn:hover {
+  background: #1E3A8A;
+  color: white;
+}
+
+.editForm {
+  padding: 20px 0;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.formGroup input,
+.formGroup textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: #1E3A8A;
+  box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .wordsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .levelHeader {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  
+  .wordActions {
+    flex-direction: column;
+  }
+}

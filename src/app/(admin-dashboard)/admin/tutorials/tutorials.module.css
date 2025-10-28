@@ -1,0 +1,18 @@
+.page { padding: 24px; background: #fcfcfc; }
+.headerCard { display: flex; gap: 16px; align-items: center; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 24px; }
+.inputPlain { background: #fff !important; border: 1px solid #d1d5db !important; border-radius: 6px !important; min-height: 40px; width: 320px; }
+.createBtn { background: #1e3a8a; color: #fff; border: none; height: 40px; border-radius: 6px; font-weight: 600; padding: 0 18px; }
+.table :global(.ant-table-container) { border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.table :global(.ant-table-thead) { background: #f9fafb; }
+.table :global(.ant-table-thead > tr > th) { background: transparent; font-weight: 700; color: #4b5563; padding: 14px 18px; }
+.table :global(.ant-table-tbody > tr > td) { padding: 14px 18px; }
+
+.iconBtn { height: 30px; padding: 0 10px; border-radius: 4px; font-weight: 600; }
+
+.modalHeader { background: #0b3b7c; color: #fff; padding: 18px 20px; font-weight: 700; }
+.modalBody { padding: 20px; }
+.toggleRow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.modalFooter { display: flex; justify-content: space-between; margin-top: 16px; }
+.cancelBtn { background: #9c2b24; color: #fff; }
+.saveBtn { background: #a7d5ff; color: #083c74; border: none; }
+

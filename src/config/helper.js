@@ -38,8 +38,25 @@ export const encryptToken = (token) => {
 
 // Decrypting the token
 export const decryptToken = (encryptedToken) => {
-  const bytes = CryptoJS.AES.decrypt(encryptedToken, secretKey);
-  return bytes.toString(CryptoJS.enc.Utf8);
+  try {
+    if (!encryptedToken) {
+      console.error('No encrypted token provided');
+      return null;
+    }
+    
+    const bytes = CryptoJS.AES.decrypt(encryptedToken, secretKey);
+    const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
+    
+    if (!decryptedToken) {
+      console.error('Failed to decrypt token - invalid key or corrupted data');
+      return null;
+    }
+    
+    return decryptedToken;
+  } catch (error) {
+    console.error('Token decryption error:', error);
+    return null;
+  }
 };
 
 export const getPreferenceVideo = (pref) => {
