@@ -141,84 +141,106 @@ export default function MyProfile() {
 
   return (
     <>
-      <div className={[classes.mainContainer, ' bg-inherit']}>
-        <div className={[classes.innerContainer]}>
-          <Row gutter={[30, 16]}>
+      <div className={[classes.mainContainer, ' bg-gray-50']}>
+        <div className={[classes.innerContainer, 'max-w-4xl mx-auto px-3 md:px-4']}> 
+          {/* Hero */}
+          <div className='mb-3 overflow-hidden rounded-2xl border border-slate-200 shadow-sm'>
+            <div className='px-5 py-5 text-white'
+              style={{ background: 'linear-gradient(90deg, #2b63cc 0%, #023789 100%)' }}>
+              <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
+                <div>
+                  <p className='text-white/90 text-sm mb-1'>Welcome back</p>
+                  <h5 className='mb-0 text-white text-2xl font-bold'>
+                    {user?.firstName || 'User'} {user?.lastName || ''}
+                  </h5>
+                  <p className='text-white/80 text-sm'>{user?.email}</p>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <button onClick={handleUpdate} disabled={loading}
+                    className='px-4 py-2 rounded-lg bg-white/15 border border-white/25 text-white hover:bg-white/25 transition-colors'>
+                    {loading ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <Row gutter={[16, 12]}>
             <Col xs={24}>
               <div className='flex items-center justify-between mb-1'>
-                <h5 className='mb-0 dark:text-white'>My Profile</h5>
+                <h5 className='mb-0 text-slate-900'>My Profile</h5>
               </div>
-              <p className='text-gray-600 dark:text-gray-300 mb-2'>
+              <p className='text-gray-600 mb-2'>
                 Keep your details up-to-date to personalize your AI learning experience.
               </p>
             </Col>
             <Col xs={24}>
-              <div className={classes.sectionCard}>
-                <h6 className='mb-3 dark:text-white pb-2 border-b-2 border-[var(--primary-color)]'>
+              <div className={`${classes.sectionCard} bg-white rounded-xl border border-slate-200 shadow-sm p-5 md:p-6`}> 
+                <h6 className='mb-2 text-slate-900 pb-2 border-b-2 border-[var(--primary-color)]'>
                   Personal Info
                 </h6>
-                <Row gutter={[30, 16]}>
-            <Col md={12} xs={24}>
-              <Input
-                placeholder='Enter first name'
-                value={firstName}
-                setter={setFirstName}
-                label={'First Name'}
-                labelClassName={'!text-black dark:!text-white'}
-              />
-            </Col>
+                <Row gutter={[16, 12]}>
+                  <Col md={12} xs={24}>
+                    <Input
+                      placeholder='Enter first name'
+                      value={firstName}
+                      setter={setFirstName}
+                      label={'First Name'}
+                      labelClassName={'!text-slate-800'}
+                    />
+                  </Col>
 
-            <Col md={12} xs={24}>
-              <Input
-                placeholder='Enter last name'
-                value={lastName}
-                setter={setLastName}
-                label={'Last Name'}
-                labelClassName={'!text-black dark:!text-white'}
-              />
-            </Col>
-            <Col md={12} xs={24}>
-              <Input
-                placeholder='Enter email'
-                type='email'
-                value={user?.email}
-                setter={() => {}}
-                label={'Email'}
-                labelClassName={'!text-black dark:!text-white'}
-                disabled={true}
-              />
-            </Col>
-            <Col md={12} xs={24}>
-              <DropDown
-                placeholder='Select your gender'
-                options={genderOptions}
-                value={gender}
-                setter={setGender}
-                label={'Gender'}
-                variant='web'
-                labelClassName={'!text-black dark:!text-white'}
-              />
-            </Col>
-            <Col md={12} xs={24}>
-              <DropDown
-                placeholder='Select your age'
-                options={ageRangeOptions}
-                value={age}
-                setter={setAge}
-                label={'Age'}
-                variant='web'
-                labelClassName={'!text-black dark:!text-white'}
-              />
-            </Col>
+                  <Col md={12} xs={24}>
+                    <Input
+                      placeholder='Enter last name'
+                      value={lastName}
+                      setter={setLastName}
+                      label={'Last Name'}
+                      labelClassName={'!text-slate-800'}
+                    />
+                  </Col>
+                  <Col md={12} xs={24}>
+                    <Input
+                      placeholder='Enter email'
+                      type='email'
+                      value={user?.email}
+                      setter={() => {}}
+                      label={'Email'}
+                      labelClassName={'!text-slate-800'}
+                      disabled={true}
+                    />
+                  </Col>
+                  <Col md={12} xs={24}>
+                    <DropDown
+                      placeholder='Select your gender'
+                      options={genderOptions}
+                      value={gender}
+                      setter={setGender}
+                      label={'Gender'}
+                      variant='web'
+                      labelClassName={'!text-slate-800'}
+                    />
+                  </Col>
+                  <Col md={12} xs={24}>
+                    <DropDown
+                      placeholder='Select your age'
+                      options={ageRangeOptions}
+                      value={age}
+                      setter={setAge}
+                      label={'Age'}
+                      variant='web'
+                      labelClassName={'!text-slate-800'}
+                    />
+                  </Col>
                 </Row>
               </div>
             </Col>
-            <Col xs={24} className='mt-4'>
-              <div className={classes.sectionCard}>
-                <h6 className='mb-3 dark:text-white pb-2 border-b-2 border-[var(--primary-color)]'>
+            <Col xs={24} className='mt-3'>
+              <div className={`${classes.sectionCard} bg-white rounded-xl border border-slate-200 shadow-sm p-5 md:p-6`}>
+                <h6 className='mb-2 text-slate-900 pb-2 border-b-2 border-[var(--primary-color)]'>
                   Background Info
                 </h6>
-                <Row gutter={[30, 16]}>
+                <Row gutter={[16, 12]}>
                   <Col md={12} xs={24}>
                     <DropDown
                       placeholder='Select your current role'
@@ -227,20 +249,20 @@ export default function MyProfile() {
                       setter={setCurrentRole}
                       label={'Current Role'}
                       variant='web'
-                      labelClassName={'!text-black dark:!text-white'}
+                      labelClassName={'!text-slate-800'}
                     />
                   </Col>
                 </Row>
               </div>
             </Col>
-            <Col xs={24} className='mt-4'>
-              <div className={classes.sectionCard}>
-                <h6 className='mb-3 dark:text-white pb-2 border-b-2 border-[var(--primary-color)]'>
+            <Col xs={24} className='mt-3'>
+              <div className={`${classes.sectionCard} bg-white rounded-xl border border-slate-200 shadow-sm p-5 md:p-6`}>
+                <h6 className='mb-2 text-slate-900 pb-2 border-b-2 border-[var(--primary-color)]'>
                   Let's Personalize Your AI Session
                 </h6>
-                <Row gutter={[30, 16]}>
+                <Row gutter={[16, 12]}>
                   <Col md={12} xs={24}>
-                    <label className='block dark:text-white mb-2 font-[var(--archivo)] text-[16px]'>
+                    <label className='block mb-2 font-[var(--archivo)] text-[15px] text-slate-800'>
                       Area of Interest (choose one)
                     </label>
                     <Radio.Group
@@ -267,9 +289,9 @@ export default function MyProfile() {
                             </>
                           }
                           variant='web'
-                          labelClassName={'!text-black dark:!text-white'}
+                          labelClassName={'!text-slate-800'}
                         />
-                        <p className='mt-1 text-sm text-gray-600 dark:text-gray-300'>
+                        <p className='mt-1 text-sm text-gray-600'>
                           Please self-assess yourself using the CEFR self-assessment document provided.{' '}
                           <a
                             href='https://www.coe.int/en/web/common-european-framework-reference-languages/self-assessment-grid'
@@ -294,11 +316,11 @@ export default function MyProfile() {
                 setter={setCommunicationStyle}
                 label={'Preferred Speaking Style'}
                 variant='web'
-                labelClassName={'!text-black dark:!text-white'}
+                labelClassName={'!text-slate-800'}
               />
             </Col>
             <Col xs={24}>
-              <label className='dark:text-white mb-2 font-[var(--archivo)] text-[16px]'>
+              <label className='mb-2 font-[var(--archivo)] text-[15px] text-slate-800'>
                 Choose your AI Teacher:
               </label>
               <div className='flex flex-wrap gap-x-3 mt-2'>
@@ -322,7 +344,7 @@ export default function MyProfile() {
                       ? 'Updating...'
                       : 'Please wait...'
                     : user?.isProfileComplete
-                    ? 'Update'
+                    ? 'Update Profile'
                     : 'Complete Profile'
                 }
                 onClick={handleUpdate}

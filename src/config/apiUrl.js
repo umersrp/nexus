@@ -1,9 +1,7 @@
-// Prefer environment variable; fallback can be set here if needed
 export const apiUrl =
   (process?.env?.NEXT_PUBLIC_API_BASE_URL || 'http://34.228.198.34:3000')
     .replace(/\/$/, '');
 
-// External AI API URL for vocab generation
 export const externalApiUrl =
   (process?.env?.EXTERNAL_API_URL || 'http://34.228.198.34:8000')
     .replace(/\/$/, '');

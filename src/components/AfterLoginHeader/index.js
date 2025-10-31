@@ -9,7 +9,6 @@ import { signOutRequest } from '../../store/auth/authSlice';
 import Style from './afterloginheader.module.css';
 
 import { setIsOpenSidebar, setTheme } from '@/store/commonReducer/commonSlice';
-import { Switch } from 'antd';
 import { FaBars } from 'react-icons/fa';
 
 export default function AfterLoginHeader({
@@ -22,7 +21,6 @@ export default function AfterLoginHeader({
   const { user: userData } = useSelector((state) => state?.authReducer);
 
   const navigate = useRouter();
-  const { theme } = useSelector((state) => state.commonReducer);
 
   const HandleSubmitSignOut = () => {
     Cookies.remove('xpdx');
@@ -32,32 +30,12 @@ export default function AfterLoginHeader({
     navigate.push('/');
   };
 
-  const items = [
-    {
-      label: <Link href={'/my-profile'}>My Profile</Link>,
-      key: '0',
-    },
-    {
-      type: 'divider',
-    },
-    {
-      label: <div>Logout</div>,
-      key: '3',
-    },
-  ];
-
   useEffect(() => {
-    if (window.matchMedia('(prefers-color-scheme: dark')?.matches) {
-      document.body.classList.add('dark');
-      dispatch(setTheme('dark'));
-    } else if (theme) {
-      document.body.classList.add(theme);
-    } else if (window.matchMedia('(prefers-color-scheme: dark')?.matches) {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.add('dark');
-    }
-  }, []);
+    // Force light theme on mount
+    document.body.classList.remove('dark');
+    document.body.classList.add('light');
+    dispatch(setTheme('light'));
+  }, [dispatch]);
 
   return (
     <Suspense>
@@ -91,16 +69,6 @@ export default function AfterLoginHeader({
                 <b className='text-[20px] text-bold ps-2'>{time}</b>
               </p>
             )}
-            <Switch
-              checkedChildren='dark'
-              unCheckedChildren='light'
-              checked={theme == 'dark'} // value={theme}
-              onChange={(e) => {
-                document.body.classList.remove(!e ? 'dark' : 'light');
-                document.body.classList.add(e ? 'dark' : 'light');
-                dispatch(setTheme(e ? 'dark' : 'light'));
-              }}
-            ></Switch>
           </div>
         </div>
       </div>
