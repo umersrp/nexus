@@ -7,12 +7,12 @@ import { CustomToast } from '@/CustomToast';
 import { Form, message, Upload } from 'antd';
 import { lazy, useEffect, useState } from 'react';
 import { FaCloudUploadAlt } from 'react-icons/fa';
-import 'react-quill/dist/quill.snow.css';
+// import 'react-quill/dist/quill.snow.css';
 import { useSelector } from 'react-redux';
 import { read, utils } from 'xlsx';
 const { Dragger } = Upload;
 const csvFile = '/demo-email-file.xlsx';
-const ReactQuill = lazy(() => import('react-quill'));
+// const ReactQuill = lazy(() => import('react-quill'));
 
 export default function SendEmail() {
   const accessToken = useSelector((state) => state.authReducer.accessToken);

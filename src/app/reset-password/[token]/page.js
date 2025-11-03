@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Post } from '@/Axios/AxiosFunctions';
 import { apiHeader, BaseURL } from '@/config/apiUrl';
 import { CustomToast } from '@/CustomToast';
-import classes from '../forgot-password/ForgotPassword.module.css';
+import classes  from '../../forgot-password/forgotPassword.module.css';
 
 const ResetPasswordPage = () => {
   const params = useParams();

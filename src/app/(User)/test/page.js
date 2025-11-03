@@ -2,7 +2,7 @@
 import TimerComp from '@/components/TimerComp';
 import VideoComp from '@/components/VideoComp';
 import { lazy } from 'react';
-import 'regenerator-runtime/runtime';
+// import 'regenerator-runtime/runtime';
 
 const SpeechToText = lazy(() => import('@/components/SpeechToText'));
 

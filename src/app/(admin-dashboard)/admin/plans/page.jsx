@@ -44,6 +44,7 @@ export default function Packages() {
       setResponseData(Array.isArray(items) ? items : []);
     }
   };
+  
   const columns = [
     {
       title: 'Name',
@@ -56,7 +57,6 @@ export default function Packages() {
         return <>€{`${record?.price}`}</>;
       },
     },
-
     {
       title: 'Session Duration',
       dataIndex: 'duration',
@@ -87,7 +87,6 @@ export default function Packages() {
   const handleUpdatePackage = async (payload) => {
     try {
       setLoading('edit');
-      // Create plan via admin route
       const urlCreate = BaseURL('subscriptions/create/plan');
       const token = getAuthToken();
       const headers = apiHeader(token);
@@ -102,36 +101,35 @@ export default function Packages() {
   };
 
   return (
-      <div className='px-[40px] mt-[40px]'>
-        <>
-          <div className='flex justify-end mb-4'>
-            <button
-              onClick={() => { setSelectedItem(null); setShowModal('edit'); }}
-              className='px-4 py-2 rounded-md text-white'
-              style={{ background: '#1E3A8A' }}
-            >
-              Create Plan
-            </button>
-          </div>
-          <TableComponent
-            columns={columns}
-            data={responseData}
-            isLoading={loading == 'get'}
-            pagination={false}
-          />
-        </>
+    <div className='px-[40px] mt-[40px]'>
+      <div className='flex justify-end mb-4'>
+        <button
+          onClick={() => { setSelectedItem(null); setShowModal('edit'); }}
+          className='px-4 py-2 rounded-md text-white'
+          style={{ background: '#1E3A8A' }}
+        >
+          Create Plan
+        </button>
       </div>
+      
+      <TableComponent
+        columns={columns}
+        data={responseData}
+        isLoading={loading == 'get'}
+        pagination={false}
+      />
 
       <ViewPackageModal
-        show={showModal == 'view'}
+        open={showModal == 'view'}
         onClose={() => {
           setShowModal(false);
           setSelectedItem(null);
         }}
         data={selectedItem}
       />
+      
       <AddOrEditPackageModal
-        show={showModal == 'edit'}
+        open={showModal == 'edit'}
         onClose={() => {
           setShowModal(false);
           setSelectedItem(null);
@@ -141,6 +139,6 @@ export default function Packages() {
         loading={loading == 'edit'}
         data={selectedItem}
       />
-    </>
+    </div>
   );
 }
