@@ -1,6 +1,5 @@
 'use client';
 import { useMemo, useState } from 'react';
-import SideBarSkeleton from '@/components/SideBarSkeleton';
 import Input from '@/components/Input';
 import { Button, Table, Space, Modal, Form, Input as AntInput, Upload, Switch } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
@@ -64,7 +63,7 @@ export default function TutorialsPage() {
   };
 
   return (
-    <SideBarSkeleton heading={'Tutorials'}>
+    <>
       <div className={classes.page}>
         <div className={classes.headerCard}>
           <Input type='text' placeholder='Search user name or email or ID' value={search} setter={setSearch} inputContainerClass={classes.inputPlain} />
@@ -105,7 +104,7 @@ export default function TutorialsPage() {
           </div>
         </Modal>
       </div>
-    </SideBarSkeleton>
+    </>
   );
 }
 

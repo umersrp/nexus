@@ -1,139 +1,95 @@
-'use client';
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
-import SpeechRecognition from 'react-speech-recognition';
 import Button from '../Button';
 import './SpeechToText.css';
 
-export default function SpeechToText({
-  onSend,
-  isAIResponse,
-  isPlaying,
-  transcript,
-  listening,
-  resetTranscript,
-  browserSupportsSpeechRecognition,
-  type = 'mic',
-  isSessionPaused,
-  onMicClick = () => null,
-}) {
-  const { user } = useSelector((state) => state.authReducer);
-  const [isSending, setIsSending] = useState(false);
-  const { isSessionExpired } = useSelector((state) => state.commonReducer);
-  const [query, setQuery] = useState('');
+const SpeechToText = ({ onTranscript, disabled = false }) => {
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const { user } = useSelector((state) => state?.authReducer);
 
-  useEffect(() => {
-    if (isSessionPaused) {
-      SpeechRecognition?.stopListening();
+  // Browser ke built-in Speech Recognition API use karo
+  const startListening = () => {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert('Speech recognition is not supported in your browser. Please use Chrome.');
+      return;
     }
-  }, [isSessionPaused]);
 
-  if (!browserSupportsSpeechRecognition) {
-    return <span>{`Browser doesn't support speech recognition.`}</span>;
-  }
+    setIsListening(true);
+    setTranscript('');
+    
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = user?.preferences?.language || 'en-US';
+
+    recognition.onresult = (event) => {
+      const currentTranscript = Array.from(event.results)
+        .map(result => result[0].transcript)
+        .join('');
+      setTranscript(currentTranscript);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      if (transcript && onTranscript) {
+        onTranscript(transcript);
+      }
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      setIsListening(false);
+    };
+
+    recognition.start();
+  };
+
+  const stopListening = () => {
+    setIsListening(false);
+    // Recognition automatically stops when isListening changes
+  };
+
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
 
   return (
-    <>
-      {type == 'text' ? (
-        <div className=' p-3 bg-[#00003026] h-full w-full  '>
-          <div
-            className={
-              'h-[calc(100%-55px)] overflow-y-auto bg-[#fbfbfb] dark:bg-[#6767f626] dark:text-white  border-1 border-[var(--blue-color)] rounded-[inherit] py-2 px-3'
-            }
-          >
-            <p className='font-semibold text-[18px]'>Transcription:</p>
-            <p>{transcript || query}</p>
-          </div>
-          <div className='flex justify-center gap-x-4 mt-3'>
-            <Button
-              disabled={
-                isPlaying ||
-                isSending ||
-                isSessionExpired ||
-                isSessionPaused ||
-                ['pending']?.includes(isAIResponse)
-              }
-              onClick={() => {
-                setQuery('');
-                resetTranscript();
-              }}
-            >
-              Reset
-            </Button>
-            <Button
-              disabled={
-                isPlaying ||
-                isSending ||
-                isSessionExpired ||
-                isSessionPaused ||
-                ['pending']?.includes(isAIResponse)
-              }
-              onClick={async () => {
-                if (isPlaying || isSessionExpired) return;
-                SpeechRecognition?.stopListening();
-                setIsSending(true);
-                await onSend(transcript);
-                setQuery(transcript);
-                resetTranscript();
-                setIsSending(false);
-              }}
-              className={' '}
-            >
-              {isSending ? 'Wait' : `Send`}
-            </Button>
-          </div>
+    <div className="speech-to-text">
+      <Button
+        onClick={toggleListening}
+        disabled={disabled}
+        className={`mic-button ${isListening ? 'listening' : ''}`}
+      >
+        {isListening ? (
+          <FaMicrophoneSlash className="mic-icon" />
+        ) : (
+          <FaMicrophone className="mic-icon" />
+        )}
+        {isListening ? 'Stop Listening' : 'Start Voice Input'}
+      </Button>
+      
+      {isListening && (
+        <div className="listening-indicator">
+          <div className="pulse"></div>
+          <span>Listening...</span>
         </div>
-      ) : (
-        <>
-          <div className='flex flex-col justify-center items-center mt-[-60px]'>
-            <button
-              id='speech'
-              class='mic-btn  type2'
-              disabled={
-                isPlaying ||
-                isSending ||
-                isSessionExpired ||
-                isSessionPaused ||
-                ['pending']?.includes(isAIResponse)
-              }
-              onClick={() => {
-                if (listening) {
-                  SpeechRecognition?.stopListening();
-                  onMicClick('off');
-                } else {
-                  SpeechRecognition?.startListening({ continuous: true });
-                  onMicClick('on');
-                }
-              }}
-            >
-              {listening && <div class='pulse-ring'></div>}
-              {listening ? <FaMicrophone /> : <FaMicrophoneSlash />}
-              <i class='fa fa-microphone' aria-hidden='true'></i>
-            </button>
-            <p className='mt-2 dark:text-white text-center'>
-              {listening ? (
-                <>
-                  <span>
-                    <b className='capitalize'>{user?.preferences}</b> is
-                    listening—go ahead and <b>speak</b>!
-                  </span>
-                </>
-              ) : (
-                <>
-                  Click the <b>microphone icon </b> to{' '}
-                  <b>{listening ? 'stop' : 'start'}</b> conversation
-                </>
-              )}
-            </p>
-          </div>
-          <p className='mt-1 dark:text-white text-[13px]'>
-            <b className='block text-[17px] text-red-600'>Important Note:</b>
-            To respond, click the <b>mic</b> and <b>begin speaking</b>. When
-            you're done, click the <b>Send</b> button to submit your response.
-          </p>
-        </>
       )}
-    </>
+      
+      {transcript && (
+        <div className="transcript">
+          <strong>You said:</strong> {transcript}
+        </div>
+      )}
+    </div>
   );
-}
+};
+
+export default SpeechToText;

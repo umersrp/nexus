@@ -32,3 +32,16 @@
   font-family: 'Courier New', monospace;
   color: #374151;
 }
+
+.viewQuizBtn {
+  background: #eef2ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+  border-radius: 9999px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(67,56,202,0.08);
+}
+.viewQuizBtn:hover {
+  background: #e0e7ff !important;
+  color: #3730a3 !important;
+}

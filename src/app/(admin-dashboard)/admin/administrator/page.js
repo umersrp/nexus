@@ -3,7 +3,6 @@ import { Delete, Patch, Post, Get } from '@/Axios/AxiosFunctions';
 import DropDown from '@/components/DropDown';
 import IconBtn from '@/components/IconBtn';
 import Input from '@/components/Input';
-import SideBarSkeleton from '@/components/SideBarSkeleton';
 import TableComponent from '@/components/TableComponent';
 import { apiHeader, BaseURL, recordsLimit } from '@/config/apiUrl';
 import { userStatusOptions } from '@/constant/commonData';
@@ -281,152 +280,150 @@ const Administrator = () => {
     
 
     return (
-        <SideBarSkeleton heading={'Administrator'}>
-            <div className={classes.mainContainer}>
-                <div className={classes.headingContainer}>
-                    <div className={classes.headerContent}>
-                        <div className={classes.titleSection}>
-                            <h1 className={classes.pageTitle}>Administrator Management</h1>
-                            <p className={classes.pageSubtitle}>Manage admin users and their permissions</p>
+        <div className={classes.mainContainer}>
+            <div className={classes.headingContainer}>
+                <div className={classes.headerContent}>
+                    <div className={classes.titleSection}>
+                        <h1 className={classes.pageTitle}>Administrator Management</h1>
+                        <p className={classes.pageSubtitle}>Manage admin users and their permissions</p>
+                    </div>
+                    <div className={classes.controlsSection}>
+                        <div className={classes.searchContainer}>
+                            <Input
+                                type={'text'}
+                                placeholder={`Search by name or email...`}
+                                value={search}
+                                setter={setSearch}
+                                inputContainerClass={classes.inputPlain}
+                            />
                         </div>
-                        <div className={classes.controlsSection}>
-                            <div className={classes.searchContainer}>
-                                <Input
-                                    type={'text'}
-                                    placeholder={`Search by name or email...`}
-                                    value={search}
-                                    setter={setSearch}
-                                    inputContainerClass={classes.inputPlain}
-                                />
-                            </div>
-                            <div className={classes.actionsContainer}>
-                                <DropDown
-                                    options={userStatusOptions}
-                                    placeholder='All Status'
-                                    onChange={(e) => setStatus(e)}
-                                    value={status}
-                                    variant='web'
-                                    customStyle={{
-                                        width: '180px',
-                                        background: '#ffffff',
-                                        border: '1px solid #d1d5db',
-                                        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                                        borderRadius: '8px',
-                                        minHeight: '40px'
-                                    }}
-                                    isSearchable
-                                    label={undefined}
-                                    containerClass=''
-                                />
-                                <Button
-                                    type="primary"
-                                    icon={<AiOutlinePlus />}
-                                    onClick={() => setShowModal('create')}
-                                    className={classes.createBtn}
-                                    size="middle"
-                                >
-                                    Create Admin
-                                </Button>
-                                
-                                {/* Session settings moved to Sessions page */}
-                            </div>
+                        <div className={classes.actionsContainer}>
+                            <DropDown
+                                options={userStatusOptions}
+                                placeholder='All Status'
+                                onChange={(e) => setStatus(e)}
+                                value={status}
+                                variant='web'
+                                customStyle={{
+                                    width: '180px',
+                                    background: '#ffffff',
+                                    border: '1px solid #d1d5db',
+                                    boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                                    borderRadius: '8px',
+                                    minHeight: '40px'
+                                }}
+                                isSearchable
+                                label={undefined}
+                                containerClass=''
+                            />
+                            <Button
+                                type="primary"
+                                icon={<AiOutlinePlus />}
+                                onClick={() => setShowModal('create')}
+                                className={classes.createBtn}
+                                size="middle"
+                            >
+                                Create Admin
+                            </Button>
+                            
+                            {/* Session settings moved to Sessions page */}
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div className={classes.statsContainer}>
-                    <div className={`${classes.statCard} ${classes.cardGreen}`}>
-                        <div className={classes.statContent}>
-                            <span className={classes.statLabel}>Total Admins</span>
-                            <span className={classes.statNumber}>{totalCount}</span>
-                        </div>
-                        <div className={`${classes.statIconBadge} ${classes.badgeGreen}`}>
-                            <UserOutlined />
-                        </div>
+            <div className={classes.statsContainer}>
+                <div className={`${classes.statCard} ${classes.cardGreen}`}>
+                    <div className={classes.statContent}>
+                        <span className={classes.statLabel}>Total Admins</span>
+                        <span className={classes.statNumber}>{totalCount}</span>
                     </div>
-                    <div className={`${classes.statCard} ${classes.cardBlue}`}>
-                        <div className={classes.statContent}>
-                            <span className={classes.statLabel}>Active</span>
-                            <span className={classes.statNumber}>{activeCount}</span>
-                        </div>
-                        <div className={`${classes.statIconBadge} ${classes.badgeBlue}`}>
-                            <CheckCircleFilled />
-                        </div>
-                    </div>
-                    <div className={`${classes.statCard} ${classes.cardOrange}`}>
-                        <div className={classes.statContent}>
-                            <span className={classes.statLabel}>Inactive</span>
-                            <span className={classes.statNumber}>{inactiveCount}</span>
-                        </div>
-                        <div className={`${classes.statIconBadge} ${classes.badgeOrange}`}>
-                            <CloseCircleFilled />
-                        </div>
+                    <div className={`${classes.statIconBadge} ${classes.badgeGreen}`}>
+                        <UserOutlined />
                     </div>
                 </div>
-
-                <div className={classes.tableWrapper}>
-                    <TableComponent
-                        columns={columns}
-                        data={paginatedData}
-                        isLoading={loading}
-                        className={classes.table}
-                        page={page}
-                        totalPages={totalPagesCalc}
-                        onPageChange={(e) => {
-                            setPage(e);
-                        }}
-                    />
+                <div className={`${classes.statCard} ${classes.cardBlue}`}>
+                    <div className={classes.statContent}>
+                        <span className={classes.statLabel}>Active</span>
+                        <span className={classes.statNumber}>{activeCount}</span>
+                    </div>
+                    <div className={`${classes.statIconBadge} ${classes.badgeBlue}`}>
+                        <CheckCircleFilled />
+                    </div>
                 </div>
+                <div className={`${classes.statCard} ${classes.cardOrange}`}>
+                    <div className={classes.statContent}>
+                        <span className={classes.statLabel}>Inactive</span>
+                        <span className={classes.statNumber}>{inactiveCount}</span>
+                    </div>
+                    <div className={`${classes.statIconBadge} ${classes.badgeOrange}`}>
+                        <CloseCircleFilled />
+                    </div>
+                </div>
+            </div>
 
-                <ViewAdminModal
-                    show={showModal == 'view'}
-                    onClose={() => {
-                        setShowModal('');
-                        setSelectedItem(null);
+            <div className={classes.tableWrapper}>
+                <TableComponent
+                    columns={columns}
+                    data={paginatedData}
+                    isLoading={loading}
+                    className={classes.table}
+                    page={page}
+                    totalPages={totalPagesCalc}
+                    onPageChange={(e) => {
+                        setPage(e);
                     }}
-                    data={selectedItem}
-                />
-
-                <CreateAdminModal
-                    show={showModal == 'create'}
-                    onClose={() => {
-                        setShowModal('');
-                    }}
-                    onSubmit={handleCreateAdmin}
-                    loading={submitLoading == 'create'}
-                />
-
-                <AreYouSureModal
-                    show={showModal == 'status'}
-                    setShow={setShowModal}
-                    subTitle={`Do you really want to ${['active', 'approved'].includes(selectedItem?.status)
-                        ? 'deactivate'
-                        : 'activate'
-                        } this admin?`}
-                    onClick={handleUpdateStatus}
-                    isApiCall={submitLoading == 'update'}
-                />
-
-                <SessionSettingsModal
-                    open={showModal == 'sessionSettings'}
-                    onClose={() => setShowModal('')}
-                    initial={sessionSettings}
-                    onSave={(val) => {
-                        setSessionSettings(val);
-                        setShowModal('');
-                        toast.success('Session settings updated');
-                    }}
-                />
-
-                <AreYouSureModal
-                    show={showModal == 'delete'}
-                    setShow={setShowModal}
-                    subTitle={`Do you really want to Delete this Admin?`}
-                    onClick={handleDelete}
-                    isApiCall={submitLoading == 'delete'}
                 />
             </div>
-        </SideBarSkeleton>
+
+            <ViewAdminModal
+                show={showModal == 'view'}
+                onClose={() => {
+                    setShowModal('');
+                    setSelectedItem(null);
+                }}
+                data={selectedItem}
+            />
+
+            <CreateAdminModal
+                show={showModal == 'create'}
+                onClose={() => {
+                    setShowModal('');
+                }}
+                onSubmit={handleCreateAdmin}
+                loading={submitLoading == 'create'}
+            />
+
+            <AreYouSureModal
+                show={showModal == 'status'}
+                setShow={setShowModal}
+                subTitle={`Do you really want to ${['active', 'approved'].includes(selectedItem?.status)
+                    ? 'deactivate'
+                    : 'activate'
+                    } this admin?`}
+                onClick={handleUpdateStatus}
+                isApiCall={submitLoading == 'update'}
+            />
+
+            <SessionSettingsModal
+                open={showModal == 'sessionSettings'}
+                onClose={() => setShowModal('')}
+                initial={sessionSettings}
+                onSave={(val) => {
+                    setSessionSettings(val);
+                    setShowModal('');
+                    toast.success('Session settings updated');
+                }}
+            />
+
+            <AreYouSureModal
+                show={showModal == 'delete'}
+                setShow={setShowModal}
+                subTitle={`Do you really want to Delete this Admin?`}
+                onClick={handleDelete}
+                isApiCall={submitLoading == 'delete'}
+            />
+        </div>
     );
 };
 

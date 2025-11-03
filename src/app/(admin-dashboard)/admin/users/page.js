@@ -3,7 +3,6 @@ import { Delete, Patch, Post, Get } from '@/Axios/AxiosFunctions';
 import DropDown from '@/components/DropDown';
 import IconBtn from '@/components/IconBtn';
 import Input from '@/components/Input';
-import SideBarSkeleton from '@/components/SideBarSkeleton';
 import TableComponent from '@/components/TableComponent';
 import { apiHeader, BaseURL, recordsLimit } from '@/config/apiUrl';
 import { userStatusOptions } from '@/constant/commonData';
@@ -17,7 +16,7 @@ import { decryptToken } from '@/config/helper';
 import { AiFillDelete, AiFillEye } from 'react-icons/ai';
 import { FaLock, FaUnlock } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
+import { notification } from 'antd';
 import classes from './users.module.css';
 
 const Users = () => {
@@ -40,7 +39,6 @@ const Users = () => {
     const raw = Cookies.get('token');
     const ls = localStorage.getItem('token');
     const dec = enc ? decryptToken(enc) : null;
-    // Prefer fresh cookie token to avoid stale localStorage tokens
     return dec || raw || accessToken || ls || undefined;
   };
 
@@ -170,7 +168,7 @@ const Users = () => {
   ];
 
   const handleUpdateStatus = async () => {
-    const url = `${apiUrl}/update-status/${selectedItem?._id}`;
+    const url = `${BaseURL('admin/users')}/update-status/${selectedItem?._id}`;
     setSubmitLoading('update');
     const response = await Patch(
       url,
@@ -191,13 +189,14 @@ const Users = () => {
         response?.data?.data
       );
       setResponseData(dataCopy);
-      toast.success(
-        `User has been ${
+      notification.success({
+        message: 'Success',
+        description: `User has been ${
           ['active', 'approved'].includes(response?.data?.data?.status)
             ? 'activated'
             : 'deactivated'
-        } successfully!`
-      );
+        } successfully!`,
+      });
 
       setShowModal('');
       setSelectedItem(null);
@@ -205,7 +204,7 @@ const Users = () => {
   };
 
   const handleDelete = async () => {
-    const url = `${apiUrl}/delete/${selectedItem?._id}`;
+    const url = `${BaseURL('admin/users')}/delete/${selectedItem?._id}`;
     setSubmitLoading('delete');
     const response = await Delete(url, null, accessToken);
     setSubmitLoading(false);
@@ -217,52 +216,53 @@ const Users = () => {
         1
       );
       setResponseData(dataCopy);
-      toast.success(`User has been deleted successfully!`);
+      notification.success({
+        message: 'Success',
+        description: 'User has been deleted successfully!',
+      });
 
       setShowModal('');
       setSelectedItem(null);
     }
   };
+
   return (
-    <SideBarSkeleton heading={'Users'}>
-      <div className={classes?.mainContainer}>
-        <>
-          <div className={[classes?.headingContainer, 'mb-5'].join(' ')}>
-            <Input
-              type={'text'}
-              placeholder={`Search name or email`}
-              value={search}
-              setter={setSearch}
-            />
-            <DropDown
-              options={userStatusOptions}
-              placeholder='Select Status'
-              onChange={(e) => {
-                setStatus(e);
-              }}
-              value={status}
-              variant='web'
-              customStyle={{ width: '200px' }}
-              isSearchable
-              label={'Status: '}
-              labelClassName={'!text-black dark:!text-white !mb-0'}
-              containerClass='!flex-row items-center gap-2'
-            />
-          </div>
-          <TableComponent
-            columns={columns}
-            data={responseData}
-            isLoading={loading}
-            className={classes.table}
-            page={page}
-            totalPages={totalPages}
-            onPageChange={(e) => {
-              getAllData(e);
-              setPage(e);
-            }}
-          />
-        </>
+    <div className={classes?.mainContainer}>
+      <div className={[classes?.headingContainer, 'mb-5'].join(' ')}>
+        <Input
+          type={'text'}
+          placeholder={`Search name or email`}
+          value={search}
+          setter={setSearch}
+        />
+        <DropDown
+          options={userStatusOptions}
+          placeholder='Select Status'
+          onChange={(e) => {
+            setStatus(e);
+          }}
+          value={status}
+          variant='web'
+          customStyle={{ width: '200px' }}
+          isSearchable
+          label={'Status: '}
+          labelClassName={'!text-black dark:!text-white !mb-0'}
+          containerClass='!flex-row items-center gap-2'
+        />
       </div>
+      
+      <TableComponent
+        columns={columns}
+        data={responseData}
+        isLoading={loading}
+        className={classes.table}
+        page={page}
+        totalPages={totalPages}
+        onPageChange={(e) => {
+          getAllData(e);
+          setPage(e);
+        }}
+      />
 
       <ViewUserModal
         show={showModal == 'view'}
@@ -292,7 +292,7 @@ const Users = () => {
         onClick={handleDelete}
         isApiCall={submitLoading == 'delete'}
       />
-    </SideBarSkeleton>
+    </div>
   );
 };
 

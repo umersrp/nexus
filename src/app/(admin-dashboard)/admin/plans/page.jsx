@@ -1,7 +1,6 @@
 'use client';
 import { Get, Post } from '@/Axios/AxiosFunctions';
 import IconBtn from '@/components/IconBtn';
-import SideBarSkeleton from '@/components/SideBarSkeleton';
 import TableComponent from '@/components/TableComponent';
 import { apiHeader, BaseURL } from '@/config/apiUrl';
 import ViewPackageModal from '@/modals/ViewPackageModal';
@@ -103,7 +102,6 @@ export default function Packages() {
   };
 
   return (
-    <SideBarSkeleton heading={'Plans'}>
       <div className='px-[40px] mt-[40px]'>
         <>
           <div className='flex justify-end mb-4'>
@@ -143,6 +141,6 @@ export default function Packages() {
         loading={loading == 'edit'}
         data={selectedItem}
       />
-    </SideBarSkeleton>
+    </>
   );
 }

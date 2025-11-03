@@ -1,7 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import SideBarSkeleton from '@/components/SideBarSkeleton';
 import Input from '@/components/Input';
 import { Button, Tag, Table, Space, Modal, Form, Input as AntInput, Select, Spin, message, Tooltip } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
@@ -45,12 +44,79 @@ export default function AISessionApproval() {
   const [generateOpen, setGenerateOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [actionLoadingById, setActionLoadingById] = useState({});
+  const [quizViewOpen, setQuizViewOpen] = useState(false);
+  const [quizLoading, setQuizLoading] = useState(false);
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch all courses on component mount
+  const fetchAllCourses = async () => {
+  if (!accessToken) {
+    console.error('ACCESS TOKEN MISSING!');
+    message.error('Please login again');
+    setLoading(false);
+    return;
+  }
+
+  console.log('Token hai:', accessToken.substring(0, 20) + '...'); // DEBUG
+
+  setLoading(true);
+  try {
+    const response = await fetch(BaseURL('courses'), {
+      method: 'GET',
+      headers: apiHeader(accessToken),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('API Error:', errorData);
+      throw new Error(errorData.message || 'Failed to fetch courses');
+    }
+
+    const data = await response.json();
+    console.log('Courses fetched:', data);
+
+    const courses = data?.data?.courses || [];
+    const transformedRows = courses
+      .filter(course => course.parentCourseId) // Fixed: parentCourse → parentCourseId
+      .map((course) => ({
+        id: course._id,
+        category: course.subject || 'N/A',
+        level: course.courseLevel || 'N/A',
+        aiList: 'Course loaded',
+        status: course.status === 'published' ? 'published' : 'draft',
+        courseId: course._id,
+        parentCourseId: course.parentCourseId,
+        courseData: {
+          childCourse: course,
+          quizzes: { majorQuiz: course.majorQuiz || null }
+        }
+      }));
+
+    setRows(transformedRows);
+  } catch (error) {
+    console.error('Error:', error);
+    message.error(error.message || 'Failed to load courses');
+  } finally {
+    setLoading(false);
+  }
+};
+
+  // Load courses on mount
+  useEffect(() => {
+    if (accessToken) {
+      console.log('Token mil gaya, courses fetch kar raha hoon...');
+      fetchAllCourses();
+    } else {
+      console.log('Token nahi hai abhi, wait kar raha hoon...');
+    }
+  }, [accessToken]);
 
   const filtered = rows.filter(r => r.category.toLowerCase().includes(search.toLowerCase()) || r.level.toLowerCase().includes(search.toLowerCase()));
 
   const setStatus = (id, status) => setRows(prev => prev.map(r => r.id === id ? { ...r, status } : r));
 
-  const publishAll = () => setRows(prev => prev.map(r => 
+  const publishAll = () => setRows(prev => prev.map(r =>
     r.status === 'draft' ? { ...r, status: 'published' } : r
   ));
 
@@ -60,13 +126,53 @@ export default function AISessionApproval() {
       console.log('No courseId found for row:', row);
       return;
     }
-    
+
     console.log('Opening course view for:', row);
     console.log('Course ID:', row.courseId);
-    
+
     // Navigate to course modules view page
     const url = `/admin/course-modules/${row.courseId}`;
     window.open(url, '_blank');
+  };
+
+  const fetchQuizById = async (quizId) => {
+    if (!quizId) return;
+    setQuizLoading(true);
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+      };
+      // Try primary path
+      let resp = await fetch(BaseURL(`quizzes/${quizId}`), { headers, method: 'GET' });
+      if (!resp.ok) {
+        // Fallback path variant
+        resp = await fetch(BaseURL(`courses/quizzes/${quizId}`), { headers, method: 'GET' });
+      }
+      if (!resp.ok) {
+        throw new Error('Failed to load quiz');
+      }
+      const data = await resp.json();
+      const quiz = data?.data?.quiz || data?.quiz || data;
+      setSelectedQuiz(quiz);
+      setQuizViewOpen(true);
+    } catch (e) {
+      message.error(e?.message || 'Unable to fetch quiz');
+    } finally {
+      setQuizLoading(false);
+    }
+  };
+
+  const handleViewQuiz = (quizId) => {
+    if (!quizId) return;
+    const url = `/admin/quiz-view/${quizId}`;
+    window.open(url, '_blank');
+  };
+
+  const handleAttemptQuiz = (quizId) => {
+    // Navigate to attempt page for this quiz id (opens in new tab)
+    const attemptUrl = `/admin/quiz-attempt/${quizId}`;
+    window.open(attemptUrl, '_blank');
   };
 
 
@@ -116,9 +222,9 @@ export default function AISessionApproval() {
       title: 'Course',
       width: 100,
       render: (_, r) => (
-        <Button 
-          size="small" 
-          type="link" 
+        <Button
+          size="small"
+          type="link"
           onClick={() => openCourseView(r)}
           disabled={!r.courseId}
           style={{ color: r.courseId ? '#1890ff' : '#ccc' }}
@@ -127,6 +233,24 @@ export default function AISessionApproval() {
           View
         </Button>
       )
+    },
+    {
+      title: 'Major Quiz',
+      width: 160,
+      render: (_, r) => {
+        const majorQuizId = r?.courseData?.quizzes?.majorQuiz?._id;
+        const disabled = !majorQuizId;
+        return (
+          <Button
+            size="small"
+            className={`${classes.actionBtn} ${classes.approve}`}
+            disabled={disabled}
+            onClick={() => handleViewQuiz(majorQuizId)}
+          >
+            View Quiz
+          </Button>
+        );
+      }
     },
     {
       title: 'Action',
@@ -168,7 +292,7 @@ export default function AISessionApproval() {
                         // keep UI resilient if backend path differs
                         // try same proxy again (it resolves backend variants)
                       }
-                      
+
                       console.log('✅ Publish response (final):', resp);
                       if (resp?.data?.success) {
                         setStatus(r.id, 'published');
@@ -190,8 +314,8 @@ export default function AISessionApproval() {
             case 'published':
               return (
                 <Space>
-                  <Button 
-                    size="small" 
+                  <Button
+                    size="small"
                     className={`${classes.actionBtn} ${classes.regen}`}
                     loading={!!actionLoadingById[r.id]}
                     disabled={!rowCourseId}
@@ -212,7 +336,7 @@ export default function AISessionApproval() {
                           console.warn('Primary unpublish 404, trying fallback /courses/unpublish/:id');
                           // proxy handles variants; no alt path needed here
                         }
-                        
+
                         if (resp?.data?.success) {
                           setStatus(r.id, 'draft');
                           message.success(resp?.data?.message || 'Course unpublished');
@@ -232,9 +356,9 @@ export default function AISessionApproval() {
               );
             case 'failed':
               return (
-                <Button 
-                  size="small" 
-                  className={`${classes.actionBtn} ${classes.reject}`} 
+                <Button
+                  size="small"
+                  className={`${classes.actionBtn} ${classes.reject}`}
                   onClick={() => setStatus(r.id, 'generating')}
                 >
                   Retry
@@ -242,9 +366,9 @@ export default function AISessionApproval() {
               );
             case 'generating':
               return (
-                <Button 
-                  size="small" 
-                  disabled 
+                <Button
+                  size="small"
+                  disabled
                   className={`${classes.actionBtn}`}
                 >
                   Generating...
@@ -282,25 +406,25 @@ export default function AISessionApproval() {
   const startGenerate = async (cat) => {
     const area = cat || category;
     if (!area) return;
-    
+
     console.log('🚀 Starting NEW course creation flow for area:', area);
     console.log('📚 LEVELS:', LEVELS);
-    
+
     // Create 5 rows for different levels with generating status
-    const seeds = LEVELS.map((lvl, i) => ({ 
-      id: `${Date.now()}-${i}`, 
-      category: area, 
-      level: lvl, 
-      aiList: '', 
+    const seeds = LEVELS.map((lvl, i) => ({
+      id: `${Date.now()}-${i}`,
+      category: area,
+      level: lvl,
+      aiList: '',
       status: 'generating', // show loader immediately
       courseId: null,
       parentCourseId: null
     }));
     setRows(prev => [...seeds, ...prev]);
     setIsGenerating(true);
-    
+
     console.log('📝 Created seeds:', seeds);
-    
+
     try {
       // Step 1: Create Parent Course
       console.log('🏗️ Step 1: Creating parent course...');
@@ -309,31 +433,31 @@ export default function AISessionApproval() {
         { areaOfInterest: area },
         apiHeader(accessToken)
       );
-      
+
       if (!parentResponse?.data?.success) {
         throw new Error('Failed to create parent course');
       }
-      
+
       const parentCourse = parentResponse.data.data.parentCourse;
       const parentCourseId = parentCourse._id;
-      
+
       console.log('✅ Parent course created:', parentCourse);
       console.log('🆔 Parent Course ID:', parentCourseId);
-      
+
       // Update all rows with parent course ID
-      setRows(prev => prev.map(r => 
-        (r.category === area && r.status === 'generating') 
-          ? { ...r, parentCourseId } 
+      setRows(prev => prev.map(r =>
+        (r.category === area && r.status === 'generating')
+          ? { ...r, parentCourseId }
           : r
       ));
-      
+
       // Step 2: Create Child Courses for each level
       console.log('👶 Step 2: Creating child courses for each level...');
-      
+
       for (let i = 0; i < LEVELS.length; i++) {
         const lvl = LEVELS[i];
         console.log(`=== Creating child course ${i + 1}/5 for level: ${lvl} ===`);
-        
+
         try {
           const childResponse = await Post(
             BaseURL('courses/create-child-course'),
@@ -344,60 +468,63 @@ export default function AISessionApproval() {
             },
             apiHeader(accessToken)
           );
-          
+
           if (childResponse?.data?.success) {
             const childCourse = childResponse.data.data.childCourse;
             console.log(`✅ Child course created for ${lvl}:`, childCourse);
-            
+
             // Update this specific level as draft and store course data
-            setRows(prev => prev.map(r => 
-              (r.category === area && r.level === lvl && r.status === 'generating') 
-                ? { 
-                    ...r, 
-                    status: 'draft', 
-                    aiList: 'Course created successfully', 
-                    courseId: childCourse._id,
-                    courseData: childResponse.data.data
-                  } 
+            setRows(prev => prev.map(r =>
+              (r.category === area && r.level === lvl && r.status === 'generating')
+                ? {
+                  ...r,
+                  status: 'draft',
+                  aiList: 'Course created successfully',
+                  courseId: childCourse._id,
+                  courseData: childResponse.data.data
+                }
                 : r
             ));
-            
+
           } else {
             throw new Error(childResponse?.data?.message || 'Failed to create child course');
           }
-          
+
         } catch (e) {
           console.error(`❌ ERROR creating child course for ${lvl}:`, e);
-          
+
           // Mark this specific level as failed
-          setRows(prev => prev.map(r => 
-            (r.category === area && r.level === lvl && r.status === 'generating') 
-              ? { ...r, status: 'failed', aiList: `Failed: ${e.message}` } 
+          setRows(prev => prev.map(r =>
+            (r.category === area && r.level === lvl && r.status === 'generating')
+              ? { ...r, status: 'failed', aiList: `Failed: ${e.message}` }
               : r
           ));
         }
-        
+
         console.log(`=== Completed child course ${i + 1}/5 ===`);
       }
-      
+
       console.log('🎉 All course creation completed');
-      
+
+      // Refresh the course list after generation
+      await fetchAllCourses();
+
     } catch (e) {
       console.error('❌ ERROR creating parent course:', e);
-      
+
       // Mark all generating rows as failed
-      setRows(prev => prev.map(r => 
-        (r.category === area && r.status === 'generating') 
-          ? { ...r, status: 'failed', aiList: `Failed: ${e.message}` } 
+      setRows(prev => prev.map(r =>
+        (r.category === area && r.status === 'generating')
+          ? { ...r, status: 'failed', aiList: `Failed: ${e.message}` }
           : r
       ));
     }
-    
+
     setIsGenerating(false);
   };
 
   return (
-    <SideBarSkeleton heading={'AI Session Approval'}>
+    <>
       <div className={classes.page}>
         <div className={classes.headerCard}>
           <Input
@@ -407,7 +534,7 @@ export default function AISessionApproval() {
             setter={setSearch}
             inputContainerClass={classes.inputPlain}
           />
-            <Button className={classes.createBtn} onClick={() => setGenerateOpen(true)} disabled={isGenerating}>{isGenerating ? 'Generating…' : 'Generate 5 Levels'}</Button>
+          <Button className={classes.createBtn} onClick={() => setGenerateOpen(true)} disabled={isGenerating}>{isGenerating ? 'Generating…' : 'Generate 5 Levels'}</Button>
 
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 10 }}>
             <Button className={classes.approveAll} onClick={async () => {
@@ -418,7 +545,7 @@ export default function AISessionApproval() {
                 try {
                   await Post(`/api/admin/courses/${cid}/publish`, {}, apiHeader(accessToken));
                   setStatus(r.id, 'published');
-                } catch(e) {}
+                } catch (e) { }
               }
               message.success('Publish triggered for all draft rows');
             }}>Publish All Draft</Button>
@@ -433,6 +560,7 @@ export default function AISessionApproval() {
           pagination={{ pageSize: 10, showSizeChanger: false }}
           bordered
           size='middle'
+          loading={loading}
           rowClassName={(_, idx) => idx % 2 === 0 ? 'row-light' : 'row-dark'}
         />
 
@@ -443,7 +571,7 @@ export default function AISessionApproval() {
           footer={null}
           centered
           width={500}
-          bodyStyle={{ padding: 0, borderRadius: 12, overflow: 'hidden' }}
+          style={{ padding: 0, borderRadius: 12, overflow: 'hidden' }}
         >
           {/* Professional Modal Header (Color: #1E3A8A) */}
           <div style={{ background: '#1E3A8A', color: 'white', padding: '16px 20px', textAlign: 'center' }}>
@@ -483,7 +611,7 @@ export default function AISessionApproval() {
           footer={null}
           centered
           width={500}
-          bodyStyle={{ padding: 0, borderRadius: 12, overflow: 'hidden' }}
+          style={{ padding: 0, borderRadius: 12, overflow: 'hidden' }}
         >
           <div style={{ background: '#1E3A8A', color: 'white', padding: '16px 20px', textAlign: 'center' }}>
             <h3 style={{ margin: 0, fontWeight: 600, fontSize: '18px' }}>Generate Vocabulary Levels</h3>
@@ -508,7 +636,59 @@ export default function AISessionApproval() {
           </div>
         </Modal>
 
+        {/* Level-wise module quizzes will be shown on the course view page, not in this table. */}
+
+        {/* Quiz View Modal */}
+        <Modal
+          open={quizViewOpen}
+          onCancel={() => { setQuizViewOpen(false); setSelectedQuiz(null); }}
+          title={null}
+          footer={null}
+          centered
+          width={800}
+          style={{ padding: 0, borderRadius: 12, overflow: 'hidden' }}
+        >
+          <div style={{ background: '#1E3A8A', color: 'white', padding: '16px 20px' }}>
+            <h3 style={{ margin: 0, fontWeight: 600, fontSize: '18px' }}>
+              {selectedQuiz ? selectedQuiz.title : 'Quiz'}
+            </h3>
+          </div>
+          <div style={{ padding: 16 }}>
+            {quizLoading ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+                <Spin />
+              </div>
+            ) : selectedQuiz ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ color: '#6b7280' }}>
+                  Total Marks: {selectedQuiz.totalMarks} • Passing: {selectedQuiz.passingMarks} • Time: {selectedQuiz.timeLimit} min
+                </div>
+                {(selectedQuiz.questions || []).map((q) => (
+                  <div key={q._id} style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 6 }}>Q{q.questionNumber}. {q.question}</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+                      {q.options && Object.entries(q.options).map(([k, v]) => (
+                        <div key={k} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px' }}>
+                          <strong style={{ marginRight: 6 }}>{k}.</strong> {v}
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ marginTop: 8, color: '#065f46' }}>
+                      Correct: {q.correctAnswer}
+                    </div>
+                    {q.explanation && (
+                      <div style={{ marginTop: 4, color: '#6b7280' }}>{q.explanation}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div>No quiz selected.</div>
+            )}
+          </div>
+        </Modal>
+
       </div>
-    </SideBarSkeleton>
+    </>
   );
 }

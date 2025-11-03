@@ -1,0 +1,26 @@
+.page {
+  padding: 24px;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.headerCard {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  position: relative;
+  text-align: center;
+}
+
+.backBtn {
+  position: absolute;
+  left: 24px;
+  top: 24px;
+}
+
+.loading {
+  text-align: center;
+  padding: 60px;
+}

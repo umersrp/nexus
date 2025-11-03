@@ -1,28 +1,7 @@
 import React from 'react';
 import { Table } from 'antd';
-import { createStyles } from 'antd-style';
 import { recordsLimit } from '@/config/apiUrl';
-const useStyle = createStyles(({ css, token }) => {
-  const antCls = 'antd';
-  return {
-    customTable: css`
-      ${antCls}-table {
-        ${antCls}-table-container {
-          ${antCls}-table-body {
-            max-height: 500px;
-            ${antCls}-table-content {
-              scrollbar-width: thin;
-              scrollbar-color: #eaeaea transparent;
-              scrollbar-gutter: stable;
-              box-shadow: 0px 1px 5px #24234254;
-            }
-          }
-        }
-      }
-    `,
-  };
-});
-
+import './TableComponent.css'; 
 const TableComponent = ({
   data = [],
   columns,
@@ -52,7 +31,7 @@ const TableComponent = ({
         x: true,
         scrollToFirstRowOnChange: true,
       }}
-      className={[!data?.length && 'noDataTable', className].join(' ')}
+      className={`custom-table ${!data?.length ? 'noDataTable' : ''} ${className}`}
       onChange={(e) => {
         onPageChange(e?.current);
       }}
@@ -60,4 +39,5 @@ const TableComponent = ({
     />
   );
 };
+
 export default TableComponent;

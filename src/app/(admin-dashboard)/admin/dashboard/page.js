@@ -1,12 +1,11 @@
 'use client';
 import { Delete, Get, Patch } from '@/Axios/AxiosFunctions';
 import IconBtn from '@/components/IconBtn';
-import SideBarSkeleton from '@/components/SideBarSkeleton';
 import TableComponent from '@/components/TableComponent';
 import { apiHeader, BaseURL } from '@/config/apiUrl';
 import AreYouSureModal from '@/modals/AreYouSureModal';
 import ViewUserModal from '@/modals/ViewUserModal';
-import { Col, Row, Skeleton, Tag } from 'antd';
+import { Col, Row, Skeleton, Tag, Card, Statistic, Progress } from 'antd';
 import { useEffect, useState } from 'react';
 import { AiFillDelete, AiFillEye } from 'react-icons/ai';
 import {
@@ -15,25 +14,13 @@ import {
   FaUnlock,
   FaUsers,
   FaUserShield,
+  FaChartLine,
+  FaMoneyBillWave,
 } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import {
-  Cell,
-  Pie,
-  PieChart,
-  Tooltip,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Legend,
-  AreaChart,
-  Area,
-  ResponsiveContainer,
-} from 'recharts';
+import { notification } from 'antd';
 import classes from './users.module.css';
+
 const StatsCard = ({ value, title, icon, loading, subtitle }) => {
   return (
     <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
@@ -74,15 +61,10 @@ const AdminDashboard = () => {
   const getAllData = async () => {
     const url = `${statsUrl}`;
     setLoading(true);
-    const apiResponse = await Get(
-      url,
-
-      accessToken
-    );
+    const apiResponse = await Get(url, accessToken);
     setLoading(false);
 
     if (apiResponse !== undefined) {
-      // Expecting { success, data: { users, courses, enrollments, revenue, quizzes } }
       setResponseData(apiResponse?.data?.data || {});
     }
   };
@@ -194,38 +176,26 @@ const AdminDashboard = () => {
       );
       setResponseData({ ...responseData, users: dataCopy });
 
-      toast.success(
-        `User has been ${['active', 'approved'].includes(response?.data?.data?.status)
+      notification.success({
+        message: 'Success',
+        description: `User has been ${['active', 'approved'].includes(response?.data?.data?.status)
           ? 'activated'
           : 'deactivated'
-        } successfully!`
-      );
+        } successfully!`,
+      });
 
       setShowModal('');
       setSelectedItem(null);
     }
   };
+
   const users = responseData?.users || {};
   const courses = responseData?.courses || {};
   const enrollments = responseData?.enrollments || {};
   const revenue = responseData?.revenue || {};
   const quizzes = responseData?.quizzes || {};
   const activeRate = users?.total ? Math.round(((users?.active || 0) / users?.total) * 100) : 0;
-  // Synthetic but safe datasets (until backend provides timeseries)
-  const months = ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
-  const userGrowthData = months.map((m, idx) => ({
-    month: m,
-    newUsers: idx === months.length - 1 ? (users?.newThisMonth || 0) : 0,
-  }));
-  const revenueTrendData = months.map((m, idx) => ({
-    month: m,
-    revenue: idx === months.length - 1 ? (Number(revenue?.thisMonth) || 0) : 0,
-  }));
-  const courseBars = [
-    { name: 'Published', value: courses?.published || 0 },
-    { name: 'Pending', value: courses?.pendingApproval || 0 },
-    { name: 'Draft', value: (courses?.total || 0) - (courses?.published || 0) - (courses?.pendingApproval || 0) },
-  ];
+
   const stats = [
     {
       title: 'Total Users',
@@ -252,13 +222,13 @@ const AdminDashboard = () => {
     {
       title: 'Revenue (This Month)',
       value: `$${(revenue?.thisMonth || 0).toFixed ? revenue?.thisMonth?.toFixed(2) : revenue?.thisMonth || 0}`,
-      icon: <FaUsers size={20} color={'#1e3a8a'} />,
+      icon: <FaMoneyBillWave size={20} color={'#1e3a8a'} />,
       subtitle: `Total $${(revenue?.total || 0).toFixed ? revenue?.total?.toFixed(2) : revenue?.total || 0}`
     },
     {
       title: 'Enrollments (This Week)',
       value: enrollments?.thisWeek,
-      icon: <FaUsers size={20} color={'#1e3a8a'} />,
+      icon: <FaChartLine size={20} color={'#1e3a8a'} />,
       subtitle: `Completion ${enrollments?.completionRate || 0}%`
     },
   ];
@@ -278,298 +248,193 @@ const AdminDashboard = () => {
         1
       );
       setResponseData({ ...responseData, users: dataCopy });
-      toast.success(`User has been deleted successfully!`);
+      notification.success({
+        message: 'Success',
+        description: 'User has been deleted successfully!',
+      });
 
       setShowModal('');
       setSelectedItem(null);
     }
   };
-  const config = {
-    data: responseData?.ratings ? responseData?.ratings : [],
-    angleField: 'value',
-    colorField: 'rating',
-    label: {
-      text: 'value',
-      position: 'outside',
-      content: ({ rating, value }) => `${rating}: ${value}`,
-      style: {
-        fontWeight: 'bold',
-      },
-    },
-    legend: {
-      color: {
-        title: false,
-        position: 'right',
-        rowPadding: 5,
-      },
-    },
-  };
 
-  const COLORS = [
-    '#0088FE',
-    '#00C49F',
-    '#FFBB28',
-    '#AF19FF',
-    '#ff19a2',
-    '#4d9906',
-  ];
-
-  const RADIAN = Math.PI / 180;
-  const renderCustomizedLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent,
-    index,
-  }) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-    return (
-      <text
-        x={x}
-        y={y}
-        fill='white'
-        textAnchor={x > cx ? 'start' : 'end'}
-        dominantBaseline='central'
-      >
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-    );
-  };
-
-  const CustomTooltip = ({ payload, label, active }) => {
-    if (active && payload && payload.length) {
-      const { name, value } = payload[0];
-
-      return (
-        <div
-          className='custom-tooltip'
-          style={{
-            backgroundColor: 'white',
-            padding: '10px',
-            border: '1px solid #ddd',
-          }}
-        >
-          <p>{`Rating: ${name}`}</p>
-          <p>{`Total: ${value}`}</p>
-        </div>
-      );
-    }
-    return <p>No Data</p>;
-  };
   return (
-    <SideBarSkeleton heading={'Dashboard'}>
+    <>
       <div className={classes?.mainContainer}>
-        <>
-          {/* <div className={[classes?.headingContainer, "mb-5"].join(" ")}>
-            <Input
-              type={"text"}
-              placeholder={`Search name or email`}
-              value={search}
-              setter={setSearch}
-            />
-            <DropDown
-              options={userStatusOptions}
-              placeholder="Select Status"
-              onChange={(e) => {
-                setStatus(e);
-              }}
-              value={status}
-              variant="web"
-              customStyle={{ width: "200px" }}
-              isSearchable
-              label={"Status: "}
-              labelClassName={"!text-black dark:!text-white !mb-0"}
-              containerClass="!flex-row items-center gap-2"
-            />
-          </div> */}
+        <Row className='mb-[40px]' gutter={[16, 16]}>
+          {stats?.map((item, index) => (
+            <Col md={8} key={index}>
+              <StatsCard
+                title={item?.title}
+                value={item?.value}
+                icon={item?.icon}
+                loading={loading}
+                subtitle={item?.subtitle}
+              />
+            </Col>
+          ))}
+        </Row>
 
-          <Row className='mb-[40px]' gutter={[16, 16]}>
-            {stats?.map((item, index) => (
-              <Col md={8} key={index}>
-                <StatsCard
-                  title={item?.title}
-                  value={item?.value}
-                  icon={item?.icon}
-                  loading={loading}
-                  subtitle={item?.subtitle}
+        {/* Simple Stats Cards instead of Charts */}
+        <Row className='mb-[40px]' gutter={[16, 16]}>
+          <Col md={8}>
+            <Card title="User Distribution" className='h-full'>
+              <div className='space-y-4'>
+                <div>
+                  <div className='flex justify-between mb-1'>
+                    <span>Active Users</span>
+                    <span>{users?.active || 0}</span>
+                  </div>
+                  <Progress 
+                    percent={activeRate} 
+                    strokeColor="#10b981"
+                    showInfo={false}
+                  />
+                </div>
+                <div>
+                  <div className='flex justify-between mb-1'>
+                    <span>Inactive Users</span>
+                    <span>{(users?.total || 0) - (users?.active || 0)}</span>
+                  </div>
+                  <Progress 
+                    percent={100 - activeRate} 
+                    strokeColor="#f59e0b"
+                    showInfo={false}
+                  />
+                </div>
+              </div>
+            </Card>
+          </Col>
+          
+          <Col md={8}>
+            <Card title="Course Status" className='h-full'>
+              <div className='space-y-4'>
+                <div>
+                  <div className='flex justify-between mb-1'>
+                    <span>Published</span>
+                    <span>{courses?.published || 0}</span>
+                  </div>
+                  <Progress 
+                    percent={courses?.total ? Math.round(((courses?.published || 0) / courses?.total) * 100) : 0} 
+                    strokeColor="#2563eb"
+                    showInfo={false}
+                  />
+                </div>
+                <div>
+                  <div className='flex justify-between mb-1'>
+                    <span>Pending</span>
+                    <span>{courses?.pendingApproval || 0}</span>
+                  </div>
+                  <Progress 
+                    percent={courses?.total ? Math.round(((courses?.pendingApproval || 0) / courses?.total) * 100) : 0} 
+                    strokeColor="#f59e0b"
+                    showInfo={false}
+                  />
+                </div>
+              </div>
+            </Card>
+          </Col>
+
+          <Col md={8}>
+            <Card title="Revenue Overview" className='h-full'>
+              <div className='text-center'>
+                <Statistic
+                  title="This Month"
+                  value={revenue?.thisMonth || 0}
+                  precision={2}
+                  prefix="$"
+                  valueStyle={{ color: '#16a34a' }}
                 />
-              </Col>
-            ))}
-          </Row>
+                <Statistic
+                  title="Total Revenue"
+                  value={revenue?.total || 0}
+                  precision={2}
+                  prefix="$"
+                  valueStyle={{ color: '#1e3a8a', fontSize: '18px' }}
+                />
+              </div>
+            </Card>
+          </Col>
+        </Row>
 
-          {/* Charts Section (Premium Layout) */}
-          <Row className='mb-[40px]' gutter={[16, 16]}>
-            <Col md={16}>
-              <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
-                <h6 className='text-gray-800 text-lg font-semibold mb-4'>New Users</h6>
-                <div className='h-72'>
-                  <ResponsiveContainer width='100%' height='100%'>
-                    <BarChart data={userGrowthData} barSize={26}>
-                      <CartesianGrid strokeDasharray='3 3' vertical={false} />
-                      <XAxis dataKey='month' tick={{ fill: '#6b7280' }} />
-                      <YAxis tick={{ fill: '#6b7280' }} />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey='newUsers' fill='#2563eb' radius={[6, 6, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+        <Row className='mb-[40px]' gutter={[16, 16]}>
+          <Col md={8}>
+            <Card title="Quiz Performance" className='h-full'>
+              <div className='space-y-3'>
+                <div className='flex justify-between items-center'>
+                  <span className='text-gray-600'>Total Attempts</span>
+                  <span className='font-semibold text-gray-900'>{quizzes?.totalAttempts || 0}</span>
+                </div>
+                <div className='flex justify-between items-center'>
+                  <span className='text-gray-600'>Passed</span>
+                  <span className='font-semibold text-green-600'>{quizzes?.passed || 0}</span>
+                </div>
+                <div className='flex justify-between items-center'>
+                  <span className='text-gray-600'>Average Score</span>
+                  <span className='font-semibold text-blue-600'>{quizzes?.averageScore || 0}%</span>
+                </div>
+                <div className='flex justify-between items-center'>
+                  <span className='text-gray-600'>Pass Rate</span>
+                  <span className='font-semibold text-purple-600'>{quizzes?.passRate || 0}%</span>
                 </div>
               </div>
-            </Col>
-            <Col md={8}>
-              <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
-                <h6 className='text-gray-800 text-lg font-semibold mb-4'>Users Split</h6>
-                <div className='h-72 flex items-center justify-center'>
-                  <PieChart width={280} height={230}>
-                    <Pie
-                      data={[
-                        { name: 'Active', value: users?.active || 0, fill: '#10b981' },
-                        { name: 'Inactive', value: (users?.total || 0) - (users?.active || 0), fill: '#f59e0b' },
-                      ]}
-                      cx='50%'
-                      cy='50%'
-                      labelLine={false}
-                      label={renderCustomizedLabel}
-                      outerRadius={85}
-                      dataKey='value'
-                    >
-                      {[
-                        { name: 'Active', value: users?.active || 0, fill: '#10b981' },
-                        { name: 'Inactive', value: (users?.total || 0) - (users?.active || 0), fill: '#f59e0b' },
-                      ].map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
+            </Card>
+          </Col>
+          
+          <Col md={8}>
+            <Card title="Enrollment Stats" className='h-full'>
+              <div className='space-y-3'>
+                <div className='flex justify-between items-center'>
+                  <span className='text-gray-600'>Total Enrollments</span>
+                  <span className='font-semibold text-gray-900'>{enrollments?.total || 0}</span>
+                </div>
+                <div className='flex justify-between items-center'>
+                  <span className='text-gray-600'>Active</span>
+                  <span className='font-semibold text-green-600'>{enrollments?.active || 0}</span>
+                </div>
+                <div className='flex justify-between items-center'>
+                  <span className='text-gray-600'>Completed</span>
+                  <span className='font-semibold text-blue-600'>{enrollments?.completed || 0}</span>
+                </div>
+                <div className='flex justify-between items-center'>
+                  <span className='text-gray-600'>This Week</span>
+                  <span className='font-semibold text-purple-600'>{enrollments?.thisWeek || 0}</span>
                 </div>
               </div>
-            </Col>
-          </Row>
+            </Card>
+          </Col>
 
-          <Row className='mb-[40px]' gutter={[16, 16]}>
-            <Col md={16}>
-              <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
-                <h6 className='text-gray-800 text-lg font-semibold mb-4'>Revenue Trend</h6>
-                <div className='h-72'>
-                  <ResponsiveContainer width='100%' height='100%'>
-                    <AreaChart data={revenueTrendData}>
-                      <defs>
-                        <linearGradient id='colorRev' x1='0' y1='0' x2='0' y2='1'>
-                          <stop offset='5%' stopColor='#16a34a' stopOpacity={0.6} />
-                          <stop offset='95%' stopColor='#16a34a' stopOpacity={0.05} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray='3 3' vertical={false} />
-                      <XAxis dataKey='month' tick={{ fill: '#6b7280' }} />
-                      <YAxis tick={{ fill: '#6b7280' }} />
-                      <Tooltip />
-                      <Area type='monotone' dataKey='revenue' stroke='#16a34a' fillOpacity={1} fill='url(#colorRev)' />
-                    </AreaChart>
-                  </ResponsiveContainer>
+          <Col md={8}>
+            <Card title="User Activity" className='h-full'>
+              <div className='space-y-3'>
+                <div className='flex justify-between items-center'>
+                  <span className='text-gray-600'>New This Month</span>
+                  <span className='font-semibold text-green-600'>{users?.newThisMonth || 0}</span>
+                </div>
+                <div className='flex justify-between items-center'>
+                  <span className='text-gray-600'>Active Rate</span>
+                  <span className='font-semibold text-blue-600'>{activeRate}%</span>
+                </div>
+                <div className='flex justify-between items-center'>
+                  <span className='text-gray-600'>Total Sessions</span>
+                  <span className='font-semibold text-purple-600'>{users?.totalSessions || 0}</span>
+                </div>
+                <div className='flex justify-between items-center'>
+                  <span className='text-gray-600'>Avg. Time</span>
+                  <span className='font-semibold text-orange-600'>{users?.avgSessionTime || '0m'}</span>
                 </div>
               </div>
-            </Col>
-            <Col md={8}>
-              <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
-                <h6 className='text-gray-800 text-lg font-semibold mb-4'>Courses Breakdown</h6>
-                <div className='h-72'>
-                  <ResponsiveContainer width='100%' height='100%'>
-                    <BarChart data={courseBars} barSize={26}>
-                      <CartesianGrid strokeDasharray='3 3' vertical={false} />
-                      <XAxis dataKey='name' tick={{ fill: '#6b7280' }} />
-                      <YAxis tick={{ fill: '#6b7280' }} />
-                      <Tooltip />
-                      <Bar dataKey='value' fill='#7c3aed' radius={[6, 6, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </Col>
-          </Row>
+            </Card>
+          </Col>
+        </Row>
 
-          <Row className='mb-[40px]' gutter={[16, 16]}>
-            <Col md={8}>
-              <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
-                <h6 className='text-gray-800 text-lg font-semibold mb-4'>Quiz Performance</h6>
-                <div className='space-y-3'>
-                  <div className='flex justify-between items-center'>
-                    <span className='text-gray-600'>Total Attempts</span>
-                    <span className='font-semibold text-gray-900'>{quizzes?.totalAttempts || 0}</span>
-                  </div>
-                  <div className='flex justify-between items-center'>
-                    <span className='text-gray-600'>Passed</span>
-                    <span className='font-semibold text-green-600'>{quizzes?.passed || 0}</span>
-                  </div>
-                  <div className='flex justify-between items-center'>
-                    <span className='text-gray-600'>Average Score</span>
-                    <span className='font-semibold text-blue-600'>{quizzes?.averageScore || 0}%</span>
-                  </div>
-                  <div className='flex justify-between items-center'>
-                    <span className='text-gray-600'>Pass Rate</span>
-                    <span className='font-semibold text-purple-600'>{quizzes?.passRate || 0}%</span>
-                  </div>
-                </div>
-              </div>
-            </Col>
-            <Col md={8}>
-              <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
-                <h6 className='text-gray-800 text-lg font-semibold mb-4'>Enrollment Stats</h6>
-                <div className='space-y-3'>
-                  <div className='flex justify-between items-center'>
-                    <span className='text-gray-600'>Total Enrollments</span>
-                    <span className='font-semibold text-gray-900'>{enrollments?.total || 0}</span>
-                  </div>
-                  <div className='flex justify-between items-center'>
-                    <span className='text-gray-600'>Active</span>
-                    <span className='font-semibold text-green-600'>{enrollments?.active || 0}</span>
-                  </div>
-                  <div className='flex justify-between items-center'>
-                    <span className='text-gray-600'>Completed</span>
-                    <span className='font-semibold text-blue-600'>{enrollments?.completed || 0}</span>
-                  </div>
-                  <div className='flex justify-between items-center'>
-                    <span className='text-gray-600'>This Week</span>
-                    <span className='font-semibold text-purple-600'>{enrollments?.thisWeek || 0}</span>
-                  </div>
-                </div>
-              </div>
-            </Col>
-            <Col md={8}>
-              <div className='px-5 py-4 rounded-xl border border-gray-200 bg-white shadow-sm'>
-                <h6 className='text-gray-800 text-lg font-semibold mb-4'>Revenue Breakdown</h6>
-                <div className='space-y-3'>
-                  <div className='flex justify-between items-center'>
-                    <span className='text-gray-600'>Total Revenue</span>
-                    <span className='font-semibold text-gray-900'>${(revenue?.total || 0).toFixed ? revenue?.total?.toFixed(2) : revenue?.total || 0}</span>
-                  </div>
-                  <div className='flex justify-between items-center'>
-                    <span className='text-gray-600'>This Month</span>
-                    <span className='font-semibold text-green-600'>${(revenue?.thisMonth || 0).toFixed ? revenue?.thisMonth?.toFixed(2) : revenue?.thisMonth || 0}</span>
-                  </div>
-                  <div className='flex items-center justify-center mt-4'>
-                    <div className='w-16 h-16 rounded-full bg-green-100 flex items-center justify-center'>
-                      <span className='text-green-600 font-bold text-lg'>$</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Col>
-          </Row>
-
-          <h5 className='text-[var(--primary-color)] mb-2 mt-5'>Users</h5>
-          <TableComponent
-            columns={columns}
-            data={Array.isArray(responseData?.users) ? responseData?.users : []}
-            isLoading={loading}
-            className={classes.table}
-          />
-        </>
+        <h5 className='text-[var(--primary-color)] mb-2 mt-5'>Users</h5>
+        <TableComponent
+          columns={columns}
+          data={Array.isArray(responseData?.users) ? responseData?.users : []}
+          isLoading={loading}
+          className={classes.table}
+        />
       </div>
 
       <ViewUserModal
@@ -598,7 +463,7 @@ const AdminDashboard = () => {
         onClick={handleDelete}
         isApiCall={submitLoading == 'delete'}
       />
-    </SideBarSkeleton>
+    </>
   );
 };
 

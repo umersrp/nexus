@@ -1,7 +1,6 @@
 'use client';
 import { Post } from '@/Axios/AxiosFunctions';
 import Input from '@/components/Input';
-import SideBarSkeleton from '@/components/SideBarSkeleton';
 import { apiHeader, BaseURL, recordsLimit } from '@/config/apiUrl';
 import useDebounce from '@/custom-hooks/useDebounce';
 import Button from '@/components/Button';
@@ -147,7 +146,7 @@ const Sessions = () => {
     },
   ];
   return (
-    <SideBarSkeleton heading={'Sessions'}>
+    <>
       <div className={classes?.mainContainer}>
         <>
           <div className={[classes?.headingContainer, 'mb-5'].join(' ')}>
@@ -202,7 +201,7 @@ const Sessions = () => {
           setSettingsOpen(false);
         }}
       />
-    </SideBarSkeleton>
+    </>
   );
 };
 

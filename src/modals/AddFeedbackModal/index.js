@@ -4,7 +4,7 @@ import classes from "./AddFeedbackModal.module.css";
 import Button from "@/components/Button";
 import TextArea from "@/components/TextArea";
 import { Col, Row } from "antd";
-import { Rating } from "react-simple-star-rating";
+// import { Rating } from "react-simple-star-rating";
 import ModalSkeleton from "../ModalSkeleton";
 
 const AddFeedbackModal = ({ show, setShow, onClick }) => {

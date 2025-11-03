@@ -35,10 +35,11 @@
   color: #ffffff; 
   border: none; 
   height: 40px; 
-  border-radius: 6px; 
+  border-radius: 9999px; 
   font-weight: 600;
   padding: 0 18px;
-  transition: background 0.2s;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px rgba(30,58,138,0.25);
 }
 .createBtn:hover { background: #172b6b; }
 
@@ -50,10 +51,11 @@
   color: #ffffff; 
   border: none; 
   height: 40px; 
-  border-radius: 6px; 
+  border-radius: 9999px; 
   font-weight: 600;
   padding: 0 18px;
-  transition: background 0.2s;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px rgba(30,58,138,0.25);
 }
 .approveAll:hover { background: #172b6b; }
 
@@ -96,33 +98,36 @@
 /* --- Action Buttons (Table Row) --- */
 .actionBtn {
   height: 30px; 
-  padding: 0 10px;
-  border-radius: 4px; 
+  padding: 0 12px;
+  border-radius: 9999px; 
   font-weight: 600;
   box-shadow: none; 
-  transition: background 0.2s;
+  transition: background 0.2s, box-shadow 0.2s, color 0.2s;
 }
 
 /* Approve (Success) - Primary Blue */
 .approve { 
-    background: #1e3a8a; 
-    color: #fff; 
-    border: none; 
+    background: #e8eefc; 
+    color: #1e3a8a; 
+    border: 1px solid #c7d2fe; 
+    box-shadow: 0 2px 6px rgba(30,58,138,0.12);
 }
-.approve:hover { background: #172b6b !important; color: #fff !important; }
+.approve:hover { background: #dbe4fb !important; color: #172b6b !important; }
 
 /* Regenerate (Secondary) - Neutral Gray */
 .regen { 
-    background: #f3f4f6; 
-    color: #4b5563; 
-    border: 1px solid #d1d5db; 
+    background: #eef2ff; 
+    color: #4338ca; 
+    border: 1px solid #c7d2fe; 
+    box-shadow: 0 2px 6px rgba(67,56,202,0.08);
 }
-.regen:hover { background: #e5e7eb !important; color: #374151 !important; }
+.regen:hover { background: #e0e7ff !important; color: #3730a3 !important; }
 
 /* Reject (Danger) - Corporate Red */
 .reject { 
-    background: #b91c1c; 
-    color: #fff; 
-    border: none; 
+    background: #fee2e2; 
+    color: #b91c1c; 
+    border: 1px solid #fecaca; 
+    box-shadow: 0 2px 6px rgba(185,28,28,0.08);
 }
-.reject:hover { background: #991b1b !important; color: #fff !important; }
+.reject:hover { background: #fecaca !important; color: #991b1b !important; }

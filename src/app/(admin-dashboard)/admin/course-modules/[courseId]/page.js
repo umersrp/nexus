@@ -2,9 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useSelector } from 'react-redux';
-import SideBarSkeleton from '@/components/SideBarSkeleton';
 import { Button, Table, Space, Modal, Form, Input, Select, message, Spin, Card, Row, Col, Tag, Tooltip } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined, DownOutlined, RightOutlined } from '@ant-design/icons';
 import { Get, Post, Put, Delete } from '@/Axios/AxiosFunctions';
 import { BaseURL, apiHeader } from '@/config/apiUrl';
 import classes from '../course-modules.module.css';
@@ -32,6 +31,19 @@ export default function CourseModules() {
   const [form] = Form.useForm();
   const [editWordState, setEditWordState] = useState({ open: false, module: null, sectionNumber: null, wordIndex: null, values: { word: '', meaning: '', example: '', usage_tip: '' } });
   const [addWordState, setAddWordState] = useState({ open: false, module: null, sectionNumber: null, values: { word: '', meaning: '', example: '', usage_tip: '' } });
+  const [quizViewOpen, setQuizViewOpen] = useState(false);
+  const [quizLoading, setQuizLoading] = useState(false);
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [expandedModuleIds, setExpandedModuleIds] = useState(new Set());
+
+  const isExpanded = (id) => expandedModuleIds.has(id);
+  const toggleExpanded = (id) => {
+    setExpandedModuleIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
 
   // Fetch course modules with words data
   const fetchModules = async () => {
@@ -213,6 +225,33 @@ export default function CourseModules() {
     window.open(url, '_blank');
   };
 
+  const fetchQuizById = async (quizId) => {
+    if (!quizId) {
+      message.warning('Quiz not available for this module');
+      return;
+    }
+    setQuizLoading(true);
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(tokenToUse ? { Authorization: `Bearer ${tokenToUse}` } : {})
+      };
+      let resp = await fetch(BaseURL(`quizzes/${quizId}`), { method: 'GET', headers });
+      if (!resp.ok) {
+        resp = await fetch(BaseURL(`courses/quizzes/${quizId}`), { method: 'GET', headers });
+      }
+      if (!resp.ok) throw new Error('Failed to fetch quiz');
+      const data = await resp.json();
+      const quiz = data?.data?.quiz || data?.quiz || data;
+      setSelectedQuiz(quiz);
+      setQuizViewOpen(true);
+    } catch (e) {
+      message.error(e?.message || 'Unable to load quiz');
+    } finally {
+      setQuizLoading(false);
+    }
+  };
+
   const columns = [
     {
       title: 'Module #',
@@ -279,7 +318,7 @@ export default function CourseModules() {
   ];
 
   return (
-    <SideBarSkeleton heading={`Course Modules - ${courseId}`}>
+    <>
       <div className={classes.page}>
         {/* Header */}
         <div className={classes.headerCard}>
@@ -297,13 +336,24 @@ export default function CourseModules() {
           {modules.map((m) => (
             <Card key={m._id} title={
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Tag color="blue">Module {m.moduleNumber}</Tag>
+                <span onClick={() => toggleExpanded(m._id)} style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}>
+                  {isExpanded(m._id) ? <DownOutlined /> : <RightOutlined />}
+                </span>
+                <Tag color="blue" style={{ marginLeft: 6 }}>Module {m.moduleNumber}</Tag>
                 <span style={{ fontWeight: 600 }}>{m.title}</span>
                 <Tag color="green">{m.wordsCount} words</Tag>
                 <Tag color="purple">{m.sections?.length || 0} sections</Tag>
               </div>
             }>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12, gap: 8 }}>
+                <Button 
+                  size="middle"
+                  className={classes.viewQuizBtn}
+                  onClick={() => { if (m.quiz_id) { window.open(`/admin/quiz-view/${m.quiz_id}`, '_blank'); } }}
+                  disabled={!m.quiz_id}
+                >
+                  View Quiz
+                </Button>
                 <Button 
                   size="middle" 
                   type="primary" 
@@ -319,61 +369,63 @@ export default function CourseModules() {
                   + Add Word
                 </Button>
               </div>
-              {(!m.allWords || m.allWords.length === 0) ? (
-                <div style={{ color: '#888' }}>No words found.</div>
-              ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
-                  {m.allWords.map((w, idx) => {
-                    const key = `${m._id}-${w.sectionNumber}-${w.wordIndex}`;
-                    const isHover = hoverKey === key;
-                    return (
-                      <div key={key}
-                        style={{ position: 'relative' }}
-                        onMouseEnter={() => setHoverKey(key)}
-                        onMouseLeave={() => setHoverKey(null)}
-                      >
-                        <Card 
-                          size="small" 
-                          style={{ 
-                            width: '100%',
-                            border: '1px solid #e5e7eb',
-                            background: '#f9fafb',
-                            boxShadow: isHover ? '0 8px 20px rgba(0,0,0,0.12)' : '0 2px 6px rgba(0,0,0,0.06)',
-                            transition: 'box-shadow 0.15s ease'
-                          }}
+              {isExpanded(m._id) && (
+                (!m.allWords || m.allWords.length === 0) ? (
+                  <div style={{ color: '#888' }}>No words found.</div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+                    {m.allWords.map((w, idx) => {
+                      const key = `${m._id}-${w.sectionNumber}-${w.wordIndex}`;
+                      const isHover = hoverKey === key;
+                      return (
+                        <div key={key}
+                          style={{ position: 'relative' }}
+                          onMouseEnter={() => setHoverKey(key)}
+                          onMouseLeave={() => setHoverKey(null)}
                         >
-                          <div style={{ fontWeight: 800, color: '#111827' }}>{w.word}</div>
-                          {w.meaning && <div style={{ color: '#374151', marginTop: 6, lineHeight: 1.4 }}>{w.meaning}</div>}
-                          {w.example && <div style={{ color: '#6b7280', marginTop: 8, fontStyle: 'italic' }}>
-                            “{w.example}”
-                          </div>}
-                          {w.usage_tip && <div style={{ color: '#6b7280', marginTop: 8, fontSize: 12 }}>
-                            Tip: {w.usage_tip}
-                          </div>}
-                        </Card>
-                        <div style={{ position: 'absolute', top: 8, right: 8, display: 'flex', gap: 6, opacity: isHover ? 1 : 0, transition: 'opacity 0.15s' }}>
-                          <Tooltip title="Edit">
-                            <Button 
-                              size="small" 
-                              shape="circle" 
-                              icon={<EditOutlined />} 
-                              onClick={() => onClickEditWord(m, w)}
-                            />
-                          </Tooltip>
-                          <Tooltip title="Delete">
-                            <Button 
-                              size="small" 
-                              shape="circle" 
-                              danger 
-                              icon={<DeleteOutlined />} 
-                              onClick={() => onClickDeleteWord(m, w)}
-                            />
-                          </Tooltip>
+                          <Card 
+                            size="small" 
+                            style={{ 
+                              width: '100%',
+                              border: '1px solid #e5e7eb',
+                              background: '#f9fafb',
+                              boxShadow: isHover ? '0 8px 20px rgba(0,0,0,0.12)' : '0 2px 6px rgba(0,0,0,0.06)',
+                              transition: 'box-shadow 0.15s ease'
+                            }}
+                          >
+                            <div style={{ fontWeight: 800, color: '#111827' }}>{w.word}</div>
+                            {w.meaning && <div style={{ color: '#374151', marginTop: 6, lineHeight: 1.4 }}>{w.meaning}</div>}
+                            {w.example && <div style={{ color: '#6b7280', marginTop: 8, fontStyle: 'italic' }}>
+                              “{w.example}”
+                            </div>}
+                            {w.usage_tip && <div style={{ color: '#6b7280', marginTop: 8, fontSize: 12 }}>
+                              Tip: {w.usage_tip}
+                            </div>}
+                          </Card>
+                          <div style={{ position: 'absolute', top: 8, right: 8, display: 'flex', gap: 6, opacity: isHover ? 1 : 0, transition: 'opacity 0.15s' }}>
+                            <Tooltip title="Edit">
+                              <Button 
+                                size="small" 
+                                shape="circle" 
+                                icon={<EditOutlined />} 
+                                onClick={() => onClickEditWord(m, w)}
+                              />
+                            </Tooltip>
+                            <Tooltip title="Delete">
+                              <Button 
+                                size="small" 
+                                shape="circle" 
+                                danger 
+                                icon={<DeleteOutlined />} 
+                                onClick={() => onClickDeleteWord(m, w)}
+                              />
+                            </Tooltip>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )
               )}
             </Card>
           ))}
@@ -471,7 +523,57 @@ export default function CourseModules() {
             </div>
           </Form>
         </Modal>
+
+        {/* Quiz View Modal */}
+        <Modal
+          open={quizViewOpen}
+          onCancel={() => { setQuizViewOpen(false); setSelectedQuiz(null); }}
+          title={null}
+          footer={null}
+          centered
+          width={800}
+          bodyStyle={{ padding: 0, borderRadius: 12, overflow: 'hidden' }}
+        >
+          <div style={{ background: '#1E3A8A', color: 'white', padding: '16px 20px' }}>
+            <h3 style={{ margin: 0, fontWeight: 600, fontSize: '18px' }}>
+              {selectedQuiz ? selectedQuiz.title : 'Quiz'}
+            </h3>
+          </div>
+          <div style={{ padding: 16 }}>
+            {quizLoading ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+                <Spin />
+              </div>
+            ) : selectedQuiz ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ color: '#6b7280' }}>
+                  Total Marks: {selectedQuiz.totalMarks} • Passing: {selectedQuiz.passingMarks} • Time: {selectedQuiz.timeLimit} min
+                </div>
+                {(selectedQuiz.questions || []).map((q) => (
+                  <div key={q._id} style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 6 }}>Q{q.questionNumber}. {q.question}</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+                      {q.options && Object.entries(q.options).map(([k, v]) => (
+                        <div key={k} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px' }}>
+                          <strong style={{ marginRight: 6 }}>{k}.</strong> {v}
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ marginTop: 8, color: '#065f46' }}>
+                      Correct: {q.correctAnswer}
+                    </div>
+                    {q.explanation && (
+                      <div style={{ marginTop: 4, color: '#6b7280' }}>{q.explanation}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div>No quiz selected.</div>
+            )}
+          </div>
+        </Modal>
       </div>
-    </SideBarSkeleton>
+    </>
   );
 }

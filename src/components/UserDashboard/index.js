@@ -16,14 +16,11 @@ import {
   setSessionPause,
   setSessionResume,
 } from '@/store/commonReducer/commonSlice';
-import { Col, Row, Spin } from 'antd';
+import { Col, Row, Spin, notification } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import Markdown from 'react-markdown';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSpeechRecognition } from 'react-speech-recognition';
-import { toast } from 'react-toastify';
-import SpeechToText from '../SpeechToText';
 import { useRouter } from 'next/navigation';
+import SpeechToText from '../SpeechToText';
 
 function UserDashboard({
   addQueryInSession,
@@ -46,12 +43,6 @@ function UserDashboard({
     lastInteractionTime,
   } = store.getState()?.commonReducer;
   const { accessToken, user } = useSelector((state) => state?.authReducer);
-  const {
-    transcript,
-    listening,
-    resetTranscript,
-    browserSupportsSpeechRecognition,
-  } = useSpeechRecognition();
 
   const [textIndex, setTextIndex] = useState(0);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -96,28 +87,40 @@ function UserDashboard({
       apiHeader(accessToken)
     );
     if (response) {
-      toast.success('Thank you for your feedback');
+      notification.success({
+        message: 'Success',
+        description: 'Thank you for your feedback',
+      });
       dispatch(setIsSessionOpen(false));
       dispatch(setIsSessionExpired(false));
       router.push('/sessions');
     }
   };
-  useEffect(() => {
-    if (listening) {
-      setIsPlaying(false);
-      audioRef.current?.pause();
-    }
-  }, [listening]);
 
   useEffect(() => {
-    if (
-      isSessionExpired &&
-      !isPlaying &&
-      !['pending', 'success'].includes(isAIResponse)
-    ) {
+    if (isSessionExpired && !isPlaying && !['pending', 'success'].includes(isAIResponse)) {
       setShowFeedback(true);
     }
   }, [isSessionExpired, isPlaying, isAIResponse]);
+
+  const renderContent = (content) => {
+    if (!content) return null;
+    
+    let formattedContent = content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br />');
+
+    return (
+      <div 
+        dangerouslySetInnerHTML={{ __html: formattedContent }}
+        style={{ 
+          whiteSpace: 'pre-wrap',
+          lineHeight: '1.6'
+        }}
+      />
+    );
+  };
 
   return (
     <MainLayout>
@@ -180,7 +183,7 @@ function UserDashboard({
                     ?.filter((a) => a?.query != answer?.text)
                     ?.map((item) => {
                       return (
-                        <>
+                        <div key={item._id}>
                           <p className='font-semibold text-[18px] mb-2'>
                             {item?.msgType == 'greet'
                               ? 'Greetings!'
@@ -191,9 +194,9 @@ function UserDashboard({
                               : 'You:'}{' '}
                           </p>
                           <p className='markdown mb-2'>
-                            <Markdown>{item?.query}</Markdown>
+                            {renderContent(item?.query)}
                           </p>
-                        </>
+                        </div>
                       );
                     })}
 
@@ -204,12 +207,12 @@ function UserDashboard({
                   <p className='font-semibold text-[20px]'>Response:</p>
                   {answer?.text && (
                     <p className='markdown'>
-                      <Markdown>
-                        {answer?.text
+                      {renderContent(
+                        answer?.text
                           ?.split(' ')
                           ?.slice(0, textIndex)
-                          ?.join(' ')}
-                      </Markdown>
+                          ?.join(' ')
+                      )}
                     </p>
                   )}
                   <div id={'ai-response-text-div'} />
@@ -218,7 +221,6 @@ function UserDashboard({
                   <Button
                     className={' block mx-auto '}
                     disabled={
-                      listening ||
                       isSessionPause ||
                       (isPlaying && isSessionExpired)
                     }
@@ -269,28 +271,12 @@ function UserDashboard({
                 }}
                 isSessionPause={isSessionPause}
                 isAIResponse={isAIResponse}
-                listening={listening}
               />
               <SpeechToText
                 onSend={(q) => addQueryInSession(q, timeRef.current?.time)}
                 isAIResponse={isAIResponse}
                 isPlaying={isPlaying}
-                listening={listening}
-                browserSupportsSpeechRecognition={
-                  browserSupportsSpeechRecognition
-                }
-                onMicClick={(status) => {
-                  dispatch(
-                    setLastInteractionTime({
-                      minutes: status == 'on' ? 0 : timeRef.current?.minutes,
-                      seconds: status == 'on' ? 0 : timeRef.current?.seconds,
-                    })
-                  );
-                }}
-                resetTranscript={resetTranscript}
-                transcript={transcript}
                 isSessionPaused={isSessionPause}
-                key={'mic'}
               />
             </div>
           </Col>
@@ -310,14 +296,7 @@ function UserDashboard({
                   }}
                   isAIResponse={isAIResponse}
                   isPlaying={isPlaying}
-                  listening={listening}
-                  browserSupportsSpeechRecognition={
-                    browserSupportsSpeechRecognition
-                  }
-                  resetTranscript={resetTranscript}
-                  transcript={transcript}
                   type='text'
-                  key={'text'}
                   isSessionPaused={isSessionPause}
                 />
               </div>

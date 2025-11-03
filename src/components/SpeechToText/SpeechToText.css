@@ -1,77 +1,55 @@
-.mic-btn {
-  border: none;
-  padding: 0;
-  border-radius: 70px;
-  width: 70px;
-  height: 70px;
-  /* font-size: 3em; */
-  color: #fff;
-  background: #189bff;
-  position: relative;
-  z-index: 3;
-  display: inline-block;
-  line-height: 70px;
-  white-space: nowrap;
-  vertical-align: middle;
-  -ms-touch-action: manipulation;
-  touch-action: manipulation;
-  cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  background-image: none;
+.speech-to-text {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  gap: 10px;
 }
 
-.pulse-ring {
-  content: '';
-  width: 70px;
-  height: 70px;
-  background: #189bff;
-  border: 5px solid #189bff;
+.mic-button.listening {
+  background-color: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+.mic-icon {
+  margin-right: 8px;
+}
+
+.listening-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #52c41a;
+  font-weight: 500;
+}
+
+.pulse {
+  width: 12px;
+  height: 12px;
+  background-color: #52c41a;
   border-radius: 50%;
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  animation: pulsate infinite 1.5s;
-}
-.mic-btn svg {
-  font-size: 30px;
+  animation: pulse 1.5s infinite;
 }
 
-.pulse-ring.delay {
-}
-
-@-webkit-keyframes pulsate {
+@keyframes pulse {
   0% {
-    -webkit-transform: scale(1, 1);
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.2);
     opacity: 1;
   }
   100% {
-    -webkit-transform: scale(1.4, 1.4);
-    opacity: 0;
+    transform: scale(0.8);
+    opacity: 0.7;
   }
 }
 
-.mic-btn .pulse-ring {
-  background: transparent;
-}
-
-@media (max-width: 768px) {
-  .mic-btn {
-    width: 65px;
-    height: 65px;
-    border-radius: 65px;
-    line-height: 65px;
-  }
-  .pulse-ring {
-    width: 100%;
-    height: 100%;
-  }
-  .mic-btn svg {
-    font-size: 30px;
-  }
+.transcript {
+  background: #f0f0f0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 4px solid #1890ff;
+  max-width: 300px;
+  word-wrap: break-word;
 }

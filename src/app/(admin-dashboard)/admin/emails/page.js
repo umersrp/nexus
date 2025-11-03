@@ -2,7 +2,6 @@
 import { Delete, Patch, Post } from '@/Axios/AxiosFunctions';
 import IconBtn from '@/components/IconBtn';
 import Input from '@/components/Input';
-import SideBarSkeleton from '@/components/SideBarSkeleton';
 import { apiHeader, BaseURL, recordsLimit } from '@/config/apiUrl';
 import useDebounce from '@/custom-hooks/useDebounce';
 import DropDown from '@/components/DropDown';
@@ -99,7 +98,7 @@ const Users = () => {
 
 
   return (
-    <SideBarSkeleton heading={'Users'}>
+    <>
       <div className={classes?.mainContainer}>
         <>
           <div className={[classes?.headingContainer, 'mb-5'].join(' ')}>
@@ -148,7 +147,7 @@ const Users = () => {
         }}
         data={selectedItem}
       />
-    </SideBarSkeleton>
+    </>
   );
 };
 

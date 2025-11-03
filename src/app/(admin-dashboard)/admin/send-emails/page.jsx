@@ -2,7 +2,6 @@
 import { Post } from '@/Axios/AxiosFunctions';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
-import SideBarSkeleton from '@/components/SideBarSkeleton';
 import { apiHeader, BaseURL } from '@/config/apiUrl';
 import { CustomToast } from '@/CustomToast';
 import { Form, message, Upload } from 'antd';
@@ -99,7 +98,7 @@ export default function SendEmail() {
   }, []);
 
   return (
-    <SideBarSkeleton heading={'Send Emails'}>
+    <>
       <div className='px-[40px]  pt-8 h-[calc(100vh-80px)] overflow-y-auto'>
         <Button className={'ms-auto block'} onClick={handleDownloadFile}>
           Download Demo File
@@ -207,6 +206,6 @@ export default function SendEmail() {
           <p>Loading...</p>
         )}
       </div>
-    </SideBarSkeleton>
+    </>
   );
 }

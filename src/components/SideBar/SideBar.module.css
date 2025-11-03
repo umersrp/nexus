@@ -1,7 +1,7 @@
 .mainContainer {
   height: 100vh;
   width: 100%;
-  background: var(--bg-color); /* keep original color */
+  background-color: #000000; /* force dark sidebar so items are visible */
   backdrop-filter: saturate(140%) blur(6px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.08);
   user-select: none;
@@ -37,7 +37,7 @@
 }
 
 .listItemContainer:hover {
-  background: rgba(255,255,255,0.06);
+  background: #043D8A;
   transform: translateY(-1px);
 }
 
@@ -57,7 +57,7 @@
 }
 
 .active {
-  background: linear-gradient(90deg, rgba(59,130,246,0.9) 0%, rgba(59,130,246,0.6) 100%);
+  background: #043D8A;
 }
 
 .active span {
@@ -92,9 +92,9 @@
 
 @media (prefers-color-scheme: light) {
   .mainContainer {
-    background: linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%);
+    background-color: #2596BE; /* keep dark in light mode too */
   }
   .logoContainer {
-    background: linear-gradient(180deg, #1e3a8a 0%, #1e3a8a 100%);
+    background: linear-gradient(180deg, #ffffff 0%, #ffffff 100%);
   }
 }
